@@ -2,6 +2,8 @@
   "name": "electron-kiosk",
   "version": "0.1.0",
   "private": true,
+  "author": "Innovation-System s.r.l <innovation.on.system@gmail.com>",
+  "description": "Electron Kiosk",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -10,9 +12,40 @@
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "icons": "electron-icon-builder --input=./src/assets/logo.png --output=./",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
+    "changelog-init": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "release": "read -p 'GITHUB_TOKEN: ' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-it"
   },
   "main": "background.js",
+  "release-it": {
+    "github": {
+      "release": true,
+      "assets": [
+        "./dist_electron/*.AppImage",
+        "./dist_electron/*.snap"
+      ]
+    },
+    "git": {
+      "tagName": "v${version}",
+      "commitMessage": "chore: release v${version}"
+    },
+    "hooks": {
+      "before:init": [
+        "npm run lint"
+      ]
+    },
+    "npm": {
+      "publish": false
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "angular",
+        "infile": "CHANGELOG.md"
+      }
+    }
+  },
   "dependencies": {
     "core-js": "^3.8.3",
     "electron-is-dev": "^2.0.0",
@@ -25,12 +58,15 @@
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
     "@electron-forge/plugin-webpack": "^6.0.0-beta.66",
+    "@release-it/conventional-changelog": "^5.1.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "@vue/eslint-config-airbnb": "^7.0.0",
+    "conventional-changelog-cli": "^2.2.2",
     "electron": "^13.0.0",
     "electron-devtools-installer": "^3.1.0",
+    "electron-icon-builder": "^2.0.1",
     "eslint": "^8.24.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -38,6 +74,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.6.0",
     "prettier": "^2.7.1",
+    "release-it": "^15.5.0",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
     "vue-cli-plugin-electron-builder": "~2.1.1",

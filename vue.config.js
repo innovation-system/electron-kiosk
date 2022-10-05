@@ -8,13 +8,18 @@ module.exports = defineConfig({
 				appId: 'com.innovation-system.electron-kiosk',
 				productName: 'Electron-Kiosk',
 				win: {
-					// icon: './public/app.ico',
+					// https://www.electron.build/configuration/win
+					icon: './icons/win/app.ico',
 					target: [
 						{
 							target: 'nsis',
 							arch: ['x64', 'ia32']
 						}
 					]
+				},
+				mac: {
+					// https://www.electron.build/configuration/mac
+					icon: './icons/mac/icon.icns'
 				}
 			}
 		}
