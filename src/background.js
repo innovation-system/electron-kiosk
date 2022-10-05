@@ -59,7 +59,8 @@ async function createWindow() {
 			nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
 			contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
 			enableRemoteModule: true
-		}
+		},
+		icon: resolve(__static, 'icon.png')
 	})
 
 	await loadMain(win)

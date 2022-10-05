@@ -20,6 +20,11 @@ module.exports = defineConfig({
 				mac: {
 					// https://www.electron.build/configuration/mac
 					icon: './icons/mac/icon.icns'
+				},
+				linux: {
+					// https://www.electron.build/configuration/linux
+					icon: './icons/png/256x256.png',
+					category: 'Utility'
 				}
 			}
 		}

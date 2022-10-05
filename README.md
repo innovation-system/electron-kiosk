@@ -1,24 +1,26 @@
-# electron-kiosk
+# Electron KIOSK
 
-## Project setup
-```
-npm install
-```
+Simple Electron app to open a website in fullscreen KIOSK mode.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Usage
 
-### Compiles and minifies for production
-```
-npm run build
-```
+You can download latest release from releases section and choose the right package for your platform.
 
-### Lints and fixes files
-```
-npm run lint
-```
+Run the application, settings windows will open by default with the url to load. Once clicked on `UPDATE` button the url will be loaded in fullscreen mode.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+To exit kiosk mode press `Ctrl+Shift+K`
+
+## Development
+
+Developers tips:
+
+```bash
+# serve electron app with hot reloading features
+npm run electron:serve
+
+# build electron app for production
+npm run electron:build
+
+# generate icons for all platforms
+npm run icons
+```
