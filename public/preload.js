@@ -1,0 +1,48 @@
+const { contextBridge, ipcRenderer } = require('electron')
+const Store = require('electron-store')
+
+const store = new Store({
+	schema: {
+		settings: {
+			type: 'object',
+			properties: {
+				url: {
+					type: 'string',
+					default: 'https://www.on-system.net'
+				},
+				autoLoad: {
+					type: 'boolean',
+					default: false
+				}
+			}
+		}
+	}
+})
+
+// Expose protected methods that allow the renderer process to use
+// the ipcRenderer without exposing the entire object
+contextBridge.exposeInMainWorld('ipc', {
+	send: (channel, data) => {
+		// whitelist channels
+		const validChannels = ['data']
+		if (validChannels.includes(channel)) {
+			ipcRenderer.send(channel, data)
+		}
+	},
+	on: (channel, func) => {
+		const validChannels = ['data']
+		if (validChannels.includes(channel)) {
+			// Deliberately strip event as it includes `sender`
+			ipcRenderer.on(channel, (event, ...args) => func(...args))
+		}
+	}
+})
+
+contextBridge.exposeInMainWorld('store', {
+	settings() {
+		return store.get('settings')
+	},
+	setSettings(settings) {
+		store.set('settings', settings)
+	}
+})

@@ -7,7 +7,6 @@ module.exports = defineConfig({
 			builderOptions: {
 				appId: 'com.innovation-system.electron-kiosk',
 				productName: 'Electron-Kiosk',
-
 				win: {
 					// icon: './public/app.ico',
 					target: [

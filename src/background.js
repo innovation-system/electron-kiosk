@@ -1,32 +1,35 @@
-import { app, protocol, BrowserWindow, globalShortcut } from 'electron'
+import { app, protocol, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import { resolve } from 'path'
+import isDev from 'electron-is-dev'
+import Store from 'electron-store'
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const store = new Store({
+	schema: {
+		settings: {
+			type: 'object',
+			properties: {
+				url: {
+					type: 'string'
+				},
+				autoLoad: {
+					type: 'boolean'
+				}
+			}
+		}
+	},
+	defaults: {
+		settings: { url: 'https://www.on-system.net', autoLoad: false }
+	}
+})
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
 	{ scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
-async function createWindow() {
-	// Create the browser window.
-	const win = new BrowserWindow({
-		width: 800,
-		height: 600,
-		fullscreen: true,
-		frame: false,
-		autoHideMenuBar: true,
-		kiosk: true,
-		webPreferences: {
-			// Use pluginOptions.nodeIntegration, leave this alone
-			// See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration
-			// for more info
-			nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-			contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
-		}
-	})
-
+async function loadMain(win) {
 	if (process.env.WEBPACK_DEV_SERVER_URL) {
 		// Load the url of the dev server if in development mode
 		await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -34,8 +37,81 @@ async function createWindow() {
 	} else {
 		createProtocol('app')
 		// Load the index.html when not in development
-		win.loadURL('app://./index.html')
+		await win.loadURL('app://./index.html')
 	}
+}
+
+async function createWindow() {
+	// Create the browser window.
+	const win = new BrowserWindow({
+		width: 1200,
+		height: 1000,
+		fullscreen: !isDev,
+		frame: isDev,
+		autoHideMenuBar: true,
+		kiosk: !isDev,
+		webPreferences: {
+			preload: resolve(__static, 'preload.js'), //  https://github.com/reZach/secure-electron-template/blob/master/app/electron/main.js#L69
+
+			// Use pluginOptions.nodeIntegration, leave this alone
+			// See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration
+			// for more info
+			nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+			contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+			enableRemoteModule: true
+		}
+	})
+
+	await loadMain(win)
+
+	return win
+}
+
+function registerShortcuts(win) {
+	globalShortcut.register('CommandOrControl+Shift+I', () => {
+		win.webContents.openDevTools()
+	})
+
+	globalShortcut.register('CommandOrControl+Shift+K', async () => {
+		store.set('settings.autoLoad', false)
+		await loadMain(win)
+	})
+
+	globalShortcut.register('CommandOrControl+Shift+L', () => {
+		win.setKiosk(!win.isKiosk())
+	})
+
+	// globalShortcut.register('CommandOrControl+Shift+R', () => {
+	// 	win.reload()
+	// })
+
+	// globalShortcut.register('CommandOrControl+Shift+Q', () => {
+	// 	app.quit()
+	// })
+
+	// globalShortcut.register('CommandOrControl+Shift+H', () => {
+	// 	win.hide()
+	// })
+
+	// globalShortcut.register('CommandOrControl+Shift+S', () => {
+	// 	win.show()
+	// })
+
+	// globalShortcut.register('CommandOrControl+Shift+M', () => {
+	// 	win.minimize()
+	// })
+
+	// globalShortcut.register('CommandOrControl+Shift+U', () => {
+	// 	win.maximize()
+	// })
+
+	// globalShortcut.register('CommandOrControl+Shift+D', () => {
+	// 	win.unmaximize()
+	// })
+
+	// globalShortcut.register('CommandOrControl+Shift+F', () => {
+	// 	win.setFullScreen(!win.isFullScreen())
+	// })
 }
 
 // Quit when all windows are closed.
@@ -57,7 +133,7 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-	if (isDevelopment && !process.env.IS_TEST) {
+	if (isDev && !process.env.IS_TEST) {
 		// Install Vue Devtools
 		try {
 			await installExtension(VUEJS_DEVTOOLS)
@@ -65,15 +141,18 @@ app.on('ready', async () => {
 			console.error('Vue Devtools failed to install:', e.toString())
 		}
 	}
-	createWindow()
+	const win = await createWindow()
 
-	globalShortcut.register('Escape', () => {
-		app.quit()
+	ipcMain.on('data', (event, arg) => {
+		console.log(arg) // prints "ping"
+		event.reply('data', 'pong')
 	})
+
+	registerShortcuts(win)
 })
 
 // Exit cleanly on request from parent process in development mode.
-if (isDevelopment) {
+if (isDev) {
 	if (process.platform === 'win32') {
 		process.on('message', data => {
 			if (data === 'graceful-exit') {

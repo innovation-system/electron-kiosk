@@ -16,7 +16,8 @@ module.exports = {
 		sourceType: 'module'
 	},
 	globals: {
-		google: true
+		google: true,
+		__static: true
 	},
 	rules: {
 		'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
