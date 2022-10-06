@@ -132,6 +132,9 @@ app.on('ready', async () => {
 	registerShortcuts(win)
 })
 
+// prevent certificates error
+app.commandLine.appendSwitch('ignore-certificate-errors')
+
 // Exit cleanly on request from parent process in development mode.
 if (isDev) {
 	if (process.platform === 'win32') {
