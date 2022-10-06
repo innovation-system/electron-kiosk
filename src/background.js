@@ -6,6 +6,14 @@ import isDev from 'electron-is-dev'
 import { platform } from 'os'
 import store from './store'
 
+const CACHE_INTERVAL = 3 * 1000
+let reloadTimeout = null
+let reloadHour = 0
+
+store.onDidChange('settings', settings => {
+	reloadHour = settings.autoReloadHour
+})
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
 	{ scheme: 'app', privileges: { secure: true, standard: true } }
@@ -53,6 +61,59 @@ async function createWindow() {
 	return win
 }
 
+async function checkCache(win) {
+	const actualCache = await win.webContents.session.getCacheSize()
+	const limit = (store.get('settings.cacheLimit') || 500) * 1024 * 1024
+
+	// console.log(`Actual cache is: ${actualCache / 1024 / 1024}`)
+	// console.log(`Limit is: ${limit / 1024 / 1024}`)
+
+	if (actualCache > limit) {
+		await win.webContents.session.clearCache()
+		await win.reload()
+	}
+}
+
+function performReload(win) {
+	if (reloadTimeout) {
+		clearTimeout(reloadTimeout)
+		reloadTimeout = null
+	}
+	win.reload()
+	this.scheduleReload(win)
+}
+
+function scheduleReload(win) {
+	const now = new Date()
+	let start
+
+	if (now.getHours() < reloadHour) {
+		start = new Date(
+			now.getFullYear(),
+			now.getMonth(),
+			now.getDate(),
+			reloadHour,
+			0,
+			0,
+			0
+		)
+	} else {
+		start = new Date(
+			now.getFullYear(),
+			now.getMonth(),
+			now.getDate() + 1,
+			reloadHour,
+			0,
+			0,
+			0
+		)
+	}
+
+	const wait = start.getTime() - now.getTime()
+
+	reloadTimeout = setTimeout(() => performReload(win), wait < 0 ? 0 : wait)
+}
+
 function registerShortcuts(win) {
 	globalShortcut.register('CommandOrControl+Shift+I', () => {
 		win.webContents.openDevTools()
@@ -67,9 +128,9 @@ function registerShortcuts(win) {
 		win.setKiosk(!win.isKiosk())
 	})
 
-	// globalShortcut.register('CommandOrControl+Shift+R', () => {
-	// 	win.reload()
-	// })
+	globalShortcut.register('CommandOrControl+Shift+R', () => {
+		win.reload()
+	})
 
 	// globalShortcut.register('CommandOrControl+Shift+Q', () => {
 	// 	app.quit()
@@ -129,12 +190,26 @@ app.on('ready', async () => {
 	}
 	const win = await createWindow()
 
-	ipcMain.on('data', (event, arg) => {
-		console.log(arg) // prints "ping"
-		// event.reply('data', 'pong')
+	ipcMain.on('action', async (event, action) => {
+		console.log(`Received action: ${action}`)
+		if (action === 'clearCache') {
+			await win.webContents.session.clearCache()
+		} else if (action === 'clearStorage') {
+			await win.webContents.session.clearStorageData()
+		}
+		event.reply('action', action)
 	})
 
 	registerShortcuts(win)
+
+	setInterval(() => {
+		checkCache(win)
+	}, CACHE_INTERVAL)
+
+	if (store.get('settings.autoReload')) {
+		reloadHour = store.get('settings.autoReloadHour') || 0
+		scheduleReload(win)
+	}
 })
 
 // prevent certificates error

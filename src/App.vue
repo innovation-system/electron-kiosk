@@ -1,7 +1,7 @@
 <template>
 	<v-app>
 		<v-main>
-			<v-container v-if="!settings.autoLoad">
+			<v-container v-if="!settings.autoLoad" style="margin-top: 100px">
 				<v-card>
 					<v-card-title>Settings</v-card-title>
 					<v-card-text>
@@ -21,18 +21,63 @@
 								</v-col>
 							</v-row>
 							<v-row>
-								<v-switch
-									v-model="settings.dark"
-									inset
-									persistent-hint
-									class="ml-3"
-								>
-									<template v-slot:label>
-										{{ settings.dark ? '🌙' : '☀️' }}
-									</template>
-								</v-switch>
+								<v-col>
+									<v-text-field
+										v-model.number="settings.cacheLimit"
+										type="number"
+										label="Cache Limit"
+										hint="When cache reaches this size clear and reload page"
+										persistent-hint
+										suffix="MB"
+										min="1"
+										:rules="[
+											v => !!v || 'Limit is required'
+										]"
+										required
+									>
+									</v-text-field>
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col :cols="12" :sm="3">
+									<v-switch
+										v-model="settings.autoReload"
+										inset
+										label="Auto Reload"
+										class="ml-3"
+									>
+									</v-switch>
+								</v-col>
+								<v-col :cols="12" :sm="5">
+									<v-select
+										v-show="settings.autoReload"
+										v-model="settings.autoReloadHour"
+										label="Hour"
+										:items="hours"
+									></v-select>
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col>
+									<v-switch v-model="settings.dark" inset>
+										<template v-slot:label>
+											{{ settings.dark ? '🌙' : '☀️' }}
+										</template>
+									</v-switch>
+								</v-col>
 							</v-row>
 						</v-form>
+						<v-divider class="my-4"></v-divider>
+						<v-row>
+							<v-col>
+								<v-btn
+									color="pink lighten-2"
+									text
+									@click="clearCache"
+									>🗑️ Clear Cache</v-btn
+								>
+							</v-col>
+						</v-row>
 					</v-card-text>
 					<v-card-actions>
 						<v-spacer></v-spacer>
@@ -47,40 +92,75 @@
 					<atom-loader :value="true" />
 				</div>
 			</v-col>
+			<v-snackbar
+				v-model="snackbar.show"
+				top
+				:color="snackbar.color"
+				timeout="2000"
+			>
+				{{ snackbar.text }}
+				<template v-slot:action="{ attrs }">
+					<v-btn text v-bind="attrs" @click="snackbar.show = false">
+						Close
+					</v-btn>
+				</template>
+			</v-snackbar>
 		</v-main>
 	</v-app>
 </template>
 
 <script>
 import AtomLoader from './components/AtomLoader.vue'
+import { formatBytes } from './utils'
 
 export default {
 	components: { AtomLoader },
 	data: () => ({
 		settings: {},
-		valid: true
+		valid: true,
+		snackbar: {
+			show: false,
+			text: null,
+			color: 'info'
+		},
+		hours: []
 	}),
+	computed: {
+		store() {
+			return window.store
+		}
+	},
 	mounted() {
-		window.ipc.on('data', (event, message) => {
-			console.log(message)
-			console.log(event)
+		window.ipc.on('action', action => {
+			if (action === 'clearCache') {
+				this.snackbar = {
+					show: true,
+					text: 'Cache cleared!',
+					color: 'success'
+				}
+			}
+			// console.log(event)
 		})
 
-		this.settings = window.store.settings()
+		this.settings = this.store.settings()
 
 		if (this.settings.autoLoad) {
 			// make xmlhttprequest to the url and check response code to see if it's 200
 			this.checkUrl()
 		}
+
+		// Add hours
+		for (let i = 0; i < 24; i++) {
+			this.hours.push({ text: `${i < 10 ? '0' : ''}${i}:00`, value: i })
+		}
 	},
 	methods: {
-		send() {
-			window.ipc.send('data', 'hello')
-		},
+		formatBytes,
 		updateSettings() {
 			if (this.$refs.form.validate()) {
 				this.settings.autoLoad = true
-				window.store.setSettings(this.settings)
+				this.store.setSettings(this.settings)
+				console.log(this.settings)
 				this.checkUrl()
 			}
 		},
@@ -102,6 +182,9 @@ export default {
 					this.checkUrl()
 				}, 2000)
 			}
+		},
+		async clearCache() {
+			window.ipc.send('action', 'clearCache')
 		}
 	},
 	watch: {

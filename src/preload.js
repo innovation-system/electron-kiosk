@@ -6,13 +6,13 @@ import store from './store'
 contextBridge.exposeInMainWorld('ipc', {
 	send: (channel, data) => {
 		// whitelist channels
-		const validChannels = ['data']
+		const validChannels = ['action']
 		if (validChannels.includes(channel)) {
 			ipcRenderer.send(channel, data)
 		}
 	},
 	on: (channel, func) => {
-		const validChannels = ['data']
+		const validChannels = ['action']
 		if (validChannels.includes(channel)) {
 			// Deliberately strip event as it includes `sender`
 			ipcRenderer.on(channel, (event, ...args) => func(...args))
