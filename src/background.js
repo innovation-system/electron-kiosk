@@ -3,6 +3,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { join } from 'path'
 import isDev from 'electron-is-dev'
+import { platform } from 'os'
 import store from './store'
 
 // Scheme must be registered before the app is ready
@@ -31,6 +32,10 @@ async function createWindow() {
 		frame: isDev,
 		autoHideMenuBar: true,
 		kiosk: !isDev,
+		icon: join(
+			__static,
+			platform() === 'win32' ? 'favicon.ico' : 'logo.png'
+		),
 		webPreferences: {
 			preload: join(__dirname, 'preload.js'), // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/guide.html#preload-files
 

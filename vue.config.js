@@ -26,7 +26,9 @@ module.exports = defineConfig({
 				},
 				linux: {
 					// https://www.electron.build/configuration/linux
-					category: 'Utility'
+					category: 'Utility',
+					packageCategory: 'utils',
+					icon: 'build/icons'
 				}
 			}
 		}
