@@ -57,14 +57,12 @@
 									></v-select>
 								</v-col>
 							</v-row>
-							<v-row>
-								<v-col>
-									<v-switch v-model="settings.dark" inset>
-										<template v-slot:label>
-											{{ settings.dark ? '🌙' : '☀️' }}
-										</template>
-									</v-switch>
-								</v-col>
+							<v-row justify="end" class="mr-2">
+								<v-switch v-model="settings.dark" inset>
+									<template v-slot:label>
+										{{ settings.dark ? '🌙' : '☀️' }}
+									</template>
+								</v-switch>
 							</v-row>
 						</v-form>
 						<v-divider class="my-4"></v-divider>
@@ -73,8 +71,14 @@
 								<v-btn
 									color="pink lighten-2"
 									text
-									@click="clearCache"
+									@click="sendAction('clearCache')"
 									>🗑️ Clear Cache</v-btn
+								>
+								<v-btn
+									color="pink lighten-2"
+									text
+									@click="sendAction('clearStorage')"
+									>🗑️ Clear Storage</v-btn
 								>
 							</v-col>
 						</v-row>
@@ -82,7 +86,7 @@
 					<v-card-actions>
 						<v-spacer></v-spacer>
 						<v-btn color="primary" @click="updateSettings">
-							Update
+							✏️ Update
 						</v-btn>
 					</v-card-actions>
 				</v-card>
@@ -132,12 +136,24 @@ export default {
 	},
 	mounted() {
 		window.ipc.on('action', action => {
-			if (action === 'clearCache') {
-				this.snackbar = {
-					show: true,
-					text: 'Cache cleared!',
-					color: 'success'
-				}
+			let text = ''
+			const color = 'success'
+
+			switch (action) {
+				case 'clearCache':
+					text = 'Cache cleared!'
+					break
+				case 'clearStorage':
+					text = 'Storage cleared!'
+					break
+				default:
+					break
+			}
+
+			this.snackbar = {
+				show: true,
+				text,
+				color
 			}
 			// console.log(event)
 		})
@@ -183,8 +199,8 @@ export default {
 				}, 2000)
 			}
 		},
-		async clearCache() {
-			window.ipc.send('action', 'clearCache')
+		async sendAction(action) {
+			window.ipc.send('action', action)
 		}
 	},
 	watch: {

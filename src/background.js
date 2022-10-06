@@ -192,11 +192,26 @@ app.on('ready', async () => {
 
 	ipcMain.on('action', async (event, action) => {
 		console.log(`Received action: ${action}`)
-		if (action === 'clearCache') {
-			await win.webContents.session.clearCache()
-		} else if (action === 'clearStorage') {
-			await win.webContents.session.clearStorageData()
+
+		switch (action) {
+			case 'clearCache':
+				await win.webContents.session.clearCache()
+				break
+			case 'clearStorage':
+				console.log('start clear')
+				await win.webContents.session.clearStorageData({
+					storages: [
+						'appcache',
+						'cookies',
+						'localstorage',
+						'cachestorage'
+					]
+				})
+				break
+			default:
+				break
 		}
+
 		event.reply('action', action)
 	})
 
