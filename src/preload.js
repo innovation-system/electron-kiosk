@@ -1,23 +1,5 @@
-const { contextBridge, ipcRenderer } = require('electron')
-const Store = require('electron-store')
-
-const store = new Store({
-	schema: {
-		settings: {
-			type: 'object',
-			properties: {
-				url: {
-					type: 'string',
-					default: 'https://www.on-system.net'
-				},
-				autoLoad: {
-					type: 'boolean',
-					default: false
-				}
-			}
-		}
-	}
-})
+import { contextBridge, ipcRenderer } from 'electron'
+import store from './store'
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object

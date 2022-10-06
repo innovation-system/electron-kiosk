@@ -4,12 +4,13 @@ module.exports = defineConfig({
 	transpileDependencies: ['vuetify'],
 	pluginOptions: {
 		electronBuilder: {
+			// https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/
+			preload: 'src/preload.js',
 			builderOptions: {
 				appId: 'com.innovation-system.electron-kiosk',
 				productName: 'Electron-Kiosk',
 				win: {
 					// https://www.electron.build/configuration/win
-					icon: './icons/win/app.ico',
 					target: [
 						{
 							target: 'nsis',
@@ -19,11 +20,9 @@ module.exports = defineConfig({
 				},
 				mac: {
 					// https://www.electron.build/configuration/mac
-					icon: './icons/mac/icon.icns'
 				},
 				linux: {
 					// https://www.electron.build/configuration/linux
-					icon: './icons/png/256x256.png',
 					category: 'Utility'
 				}
 			}

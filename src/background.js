@@ -1,28 +1,9 @@
 import { app, protocol, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-import { resolve } from 'path'
+import { join } from 'path'
 import isDev from 'electron-is-dev'
-import Store from 'electron-store'
-
-const store = new Store({
-	schema: {
-		settings: {
-			type: 'object',
-			properties: {
-				url: {
-					type: 'string'
-				},
-				autoLoad: {
-					type: 'boolean'
-				}
-			}
-		}
-	},
-	defaults: {
-		settings: { url: 'https://www.on-system.net', autoLoad: false }
-	}
-})
+import store from './store'
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -51,7 +32,7 @@ async function createWindow() {
 		autoHideMenuBar: true,
 		kiosk: !isDev,
 		webPreferences: {
-			preload: resolve(__static, 'preload.js'), //  https://github.com/reZach/secure-electron-template/blob/master/app/electron/main.js#L69
+			preload: join(__dirname, 'preload.js'), // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/guide.html#preload-files
 
 			// Use pluginOptions.nodeIntegration, leave this alone
 			// See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration
@@ -59,8 +40,7 @@ async function createWindow() {
 			nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
 			contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
 			enableRemoteModule: true
-		},
-		icon: resolve(__static, 'icon.png')
+		}
 	})
 
 	await loadMain(win)
