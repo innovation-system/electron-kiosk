@@ -2,6 +2,9 @@ const { defineConfig } = require('@vue/cli-service')
 
 module.exports = defineConfig({
 	transpileDependencies: ['vuetify'],
+	devServer: {
+		port: 8000
+	},
 	pluginOptions: {
 		electronBuilder: {
 			// https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/

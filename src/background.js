@@ -134,6 +134,7 @@ app.on('ready', async () => {
 
 // prevent certificates error
 app.commandLine.appendSwitch('ignore-certificate-errors')
+app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
 
 // Exit cleanly on request from parent process in development mode.
 if (isDev) {
