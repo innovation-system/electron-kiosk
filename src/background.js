@@ -126,7 +126,7 @@ app.on('ready', async () => {
 
 	ipcMain.on('data', (event, arg) => {
 		console.log(arg) // prints "ping"
-		event.reply('data', 'pong')
+		// event.reply('data', 'pong')
 	})
 
 	registerShortcuts(win)

@@ -15,6 +15,12 @@ const store = new Store({
 				}
 			}
 		}
+	},
+	defaults: {
+		settings: {
+			url: 'https://www.on-system.net',
+			autoLoad: false
+		}
 	}
 })
 
