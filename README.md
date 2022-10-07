@@ -10,6 +10,10 @@ Run the application, settings windows will open by default with the url to load.
 
 To exit kiosk mode press `Ctrl+Shift+K`
 
+## Demo
+
+![Demo](docs/demo.gif)
+
 ## Development
 
 Developers tips:
@@ -24,3 +28,4 @@ npm run electron:build
 # generate icons for all platforms
 npm run icons
 ```
+

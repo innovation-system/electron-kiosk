@@ -21,11 +21,7 @@
   "main": "background.js",
   "release-it": {
     "github": {
-      "release": true,
-      "assets": [
-        "./dist_electron/*.AppImage",
-        "./dist_electron/*.snap"
-      ]
+      "release": true
     },
     "git": {
       "tagName": "v${version}",
