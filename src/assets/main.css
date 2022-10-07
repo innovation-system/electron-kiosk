@@ -1,0 +1,39 @@
+
+/* Hacky hack. Fix scroll bug on modals on touch devices */
+html,body{
+	-webkit-overflow-scrolling: auto !important;
+	overflow: auto !important;
+	height: 100% !important;
+}
+
+/* Custom Scrollbar */
+
+/* Firefox */
+html,body{
+	scrollbar-color: rgba(255, 255, 255, 0.05) transparent;
+	scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+	height: 5px;
+	width: 3px;
+	background: transparent;
+	padding-right: 10;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 1ex;
+	-webkit-border-radius: 1ex;
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+/* Hacky hack. Remove scrollbars for 320 width screens */
+@media screen and (max-width : 320px) {
+	body::-webkit-scrollbar {
+		display: none;
+	}
+}
