@@ -6,9 +6,12 @@ Simple Electron app to open a website in fullscreen KIOSK mode.
 
 You can download latest release from releases section and choose the right package for your platform.
 
-Run the application, settings windows will open by default with the url to load. Once clicked on `UPDATE` button the url will be loaded in fullscreen mode.
+1. Run the application, main settings windows will open by default with the url to load.
+2. Edit settings and on `UPDATE` button, the url will be loaded in fullscreen mode.
 
-To exit kiosk mode press `Ctrl+Shift+K`
+Starting from now the application will always load that url on startup, if the url is not reachable, the application will show a loader until the url is reachable again.
+
+To go back to settings press `Ctrl+Shift+K`.
 
 ## Demo
 
