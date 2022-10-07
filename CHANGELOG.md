@@ -1,5 +1,12 @@
 
 
+## [0.2.1](https://github.com/innovation-system/electron-kiosk/compare/v0.2.0...v0.2.1) (2022-10-07)
+
+
+### Bug Fixes
+
+* upload to release assets ([afb3720](https://github.com/innovation-system/electron-kiosk/commit/afb3720b9eb903d3c8e210df247a4fbdbdac4987))
+
 # 0.2.0 (2022-10-07)
 
 
