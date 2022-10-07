@@ -139,7 +139,10 @@ export default {
 			text: null,
 			color: 'info'
 		},
-		hours: []
+		hours: new Array(24).fill(0).map((v, i) => ({
+			text: `${i < 10 ? '0' : ''}${i}:00`,
+			value: i
+		}))
 	}),
 	computed: {
 		store() {
@@ -175,18 +178,12 @@ export default {
 		if (this.settings.autoLoad) {
 			this.checkUrl()
 		}
-
-		// Add hours
-		for (let i = 0; i < 24; i++) {
-			this.hours.push({ text: `${i < 10 ? '0' : ''}${i}:00`, value: i })
-		}
 	},
 	methods: {
 		updateSettings() {
 			if (this.$refs.form.validate()) {
 				this.settings.autoLoad = true
 				this.store.setSettings(this.settings)
-				console.log(this.settings)
 				this.checkUrl()
 			}
 		},
