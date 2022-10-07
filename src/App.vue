@@ -3,7 +3,8 @@
 		<v-main>
 			<v-container v-if="!settings.autoLoad" style="margin-top: 100px">
 				<v-card>
-					<v-card-title>Settings</v-card-title>
+					<!-- eslint-disable-next-line no-irregular-whitespace -->
+					<v-card-title>⚙️ Settings​</v-card-title>
 					<v-card-text>
 						<v-form
 							ref="form"
@@ -11,17 +12,17 @@
 							@submit.prevent="updateSettings"
 						>
 							<v-row>
-								<v-col>
+								<v-col :cols="12" :sm="6">
 									<v-text-field
 										v-model="settings.url"
 										label="URL"
-										:rules="[v => !!v || 'URL is required']"
+										hint="URL to load"
+										:rules="[validUrl]"
 										required
 									></v-text-field>
 								</v-col>
-							</v-row>
-							<v-row>
-								<v-col>
+
+								<v-col :cols="12" :sm="6">
 									<v-text-field
 										v-model.number="settings.cacheLimit"
 										type="number"
@@ -37,32 +38,38 @@
 									>
 									</v-text-field>
 								</v-col>
-							</v-row>
-							<v-row>
-								<v-col :cols="12" :sm="3">
+
+								<v-col :cols="12" :sm="6">
 									<v-switch
 										v-model="settings.autoReload"
 										inset
-										label="Auto Reload"
+										label="Scheduled Reload"
 										class="ml-3"
 									>
 									</v-switch>
 								</v-col>
-								<v-col :cols="12" :sm="5">
+								<v-col :cols="12" :sm="6">
 									<v-select
-										v-show="settings.autoReload"
+										:disabled="!settings.autoReload"
 										v-model="settings.autoReloadHour"
+										persistent-hint
+										hint="Reload page at this hour"
 										label="Hour"
 										:items="hours"
 									></v-select>
 								</v-col>
-							</v-row>
-							<v-row justify="end" class="mr-2">
-								<v-switch v-model="settings.dark" inset>
-									<template v-slot:label>
-										{{ settings.dark ? '🌙' : '☀️' }}
-									</template>
-								</v-switch>
+								<v-col :cols="12" :sm="6">
+									<v-switch
+										v-model="settings.dark"
+										inset
+										label="Theme"
+										class="ml-3"
+									>
+										<template v-slot:label>
+											{{ settings.dark ? '🌙' : '☀️' }}
+										</template>
+									</v-switch>
+								</v-col>
 							</v-row>
 						</v-form>
 						<v-divider class="my-4"></v-divider>
@@ -85,7 +92,13 @@
 					</v-card-text>
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn color="primary" @click="updateSettings">
+						<v-btn
+							text
+							outlined
+							:disabled="!valid"
+							color="primary"
+							@click="updateSettings"
+						>
 							✏️ Update
 						</v-btn>
 					</v-card-actions>
@@ -115,7 +128,6 @@
 
 <script>
 import AtomLoader from './components/AtomLoader.vue'
-import { formatBytes } from './utils'
 
 export default {
 	components: { AtomLoader },
@@ -147,6 +159,7 @@ export default {
 					text = 'Storage cleared!'
 					break
 				default:
+					text = `Unknown action ${action}`
 					break
 			}
 
@@ -155,13 +168,11 @@ export default {
 				text,
 				color
 			}
-			// console.log(event)
 		})
 
 		this.settings = this.store.settings()
 
 		if (this.settings.autoLoad) {
-			// make xmlhttprequest to the url and check response code to see if it's 200
 			this.checkUrl()
 		}
 
@@ -171,13 +182,24 @@ export default {
 		}
 	},
 	methods: {
-		formatBytes,
 		updateSettings() {
 			if (this.$refs.form.validate()) {
 				this.settings.autoLoad = true
 				this.store.setSettings(this.settings)
 				console.log(this.settings)
 				this.checkUrl()
+			}
+		},
+		validUrl(url) {
+			try {
+				const parsed = new URL(url)
+				return (
+					parsed.protocol === 'http:' ||
+					parsed.protocol === 'https:' ||
+					'Invalid URL'
+				)
+			} catch (e) {
+				return 'Invalid URL'
 			}
 		},
 		async checkUrl() {

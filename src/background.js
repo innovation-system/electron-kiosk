@@ -8,18 +8,16 @@ import store from './store'
 
 const CACHE_INTERVAL = 3 * 1000
 let reloadTimeout = null
-let reloadHour = 0
 
-store.onDidChange('settings', settings => {
-	reloadHour = settings.autoReloadHour
-})
+let win = null // main window
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
 	{ scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
-async function loadMain(win) {
+/** Load main settings page */
+async function loadMain() {
 	if (process.env.WEBPACK_DEV_SERVER_URL) {
 		// Load the url of the dev server if in development mode
 		await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -31,9 +29,10 @@ async function loadMain(win) {
 	}
 }
 
+/** Create the KIOSK fullscreen window */
 async function createWindow() {
 	// Create the browser window.
-	const win = new BrowserWindow({
+	win = new BrowserWindow({
 		width: 1200,
 		height: 1000,
 		fullscreen: !isDev,
@@ -56,12 +55,11 @@ async function createWindow() {
 		}
 	})
 
-	await loadMain(win)
-
-	return win
+	await loadMain()
 }
 
-async function checkCache(win) {
+/** Periodic check of session cache, when limit is reached clear cache and reload page */
+async function checkCache() {
 	const actualCache = await win.webContents.session.getCacheSize()
 	const limit = (store.get('settings.cacheLimit') || 500) * 1024 * 1024
 
@@ -74,18 +72,21 @@ async function checkCache(win) {
 	}
 }
 
-function performReload(win) {
+/** When `settings.autoReload` is enabled schedule a reload to a specific hour */
+function scheduleReload() {
 	if (reloadTimeout) {
 		clearTimeout(reloadTimeout)
 		reloadTimeout = null
 	}
-	win.reload()
-	this.scheduleReload(win)
-}
 
-function scheduleReload(win) {
+	if (!store.get('settings.autoReload')) {
+		return
+	}
+
 	const now = new Date()
 	let start
+
+	const reloadHour = store.get('settings.autoReloadHour') || 0
 
 	if (now.getHours() < reloadHour) {
 		start = new Date(
@@ -111,17 +112,44 @@ function scheduleReload(win) {
 
 	const wait = start.getTime() - now.getTime()
 
-	reloadTimeout = setTimeout(() => performReload(win), wait < 0 ? 0 : wait)
+	reloadTimeout = setTimeout(
+		() => {
+			if (reloadTimeout) {
+				clearTimeout(reloadTimeout)
+				reloadTimeout = null
+			}
+			win.reload()
+			this.scheduleReload()
+		},
+		wait < 0 ? 0 : wait
+	)
 }
 
-function registerShortcuts(win) {
+/** Setup store related events and listeners */
+function setupStore() {
+	setInterval(() => {
+		checkCache()
+	}, CACHE_INTERVAL)
+
+	// watch for settings changes
+	store.onDidChange('settings', () => {
+		scheduleReload()
+	})
+
+	scheduleReload()
+}
+
+/** Global application shortcuts */
+function registerShortcuts() {
 	globalShortcut.register('CommandOrControl+Shift+I', () => {
 		win.webContents.openDevTools()
 	})
 
 	globalShortcut.register('CommandOrControl+Shift+K', async () => {
 		store.set('settings.autoLoad', false)
-		await loadMain(win)
+		loadMain().catch(err => {
+			console.error(err)
+		})
 	})
 
 	globalShortcut.register('CommandOrControl+Shift+L', () => {
@@ -161,6 +189,34 @@ function registerShortcuts(win) {
 	// })
 }
 
+/** Register to IPC releated events */
+function registerIpc() {
+	ipcMain.on('action', async (event, action) => {
+		try {
+			switch (action) {
+				case 'clearCache':
+					await win.webContents.session.clearCache()
+					break
+				case 'clearStorage':
+					await win.webContents.session.clearStorageData({
+						storages: [
+							'appcache',
+							'cookies',
+							'localstorage',
+							'cachestorage'
+						]
+					})
+					break
+				default:
+					break
+			}
+		} catch (error) {
+			console.error(error)
+		}
+		event.reply('action', action)
+	})
+}
+
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
 	// On macOS it is common for applications and their menu bar
@@ -188,46 +244,15 @@ app.on('ready', async () => {
 			console.error('Vue Devtools failed to install:', e.toString())
 		}
 	}
-	const win = await createWindow()
 
-	ipcMain.on('action', async (event, action) => {
-		console.log(`Received action: ${action}`)
+	await createWindow()
 
-		switch (action) {
-			case 'clearCache':
-				await win.webContents.session.clearCache()
-				break
-			case 'clearStorage':
-				console.log('start clear')
-				await win.webContents.session.clearStorageData({
-					storages: [
-						'appcache',
-						'cookies',
-						'localstorage',
-						'cachestorage'
-					]
-				})
-				break
-			default:
-				break
-		}
-
-		event.reply('action', action)
-	})
-
-	registerShortcuts(win)
-
-	setInterval(() => {
-		checkCache(win)
-	}, CACHE_INTERVAL)
-
-	if (store.get('settings.autoReload')) {
-		reloadHour = store.get('settings.autoReloadHour') || 0
-		scheduleReload(win)
-	}
+	registerIpc()
+	registerShortcuts()
+	setupStore()
 })
 
-// prevent certificates error
+// Ignore certificates errors on page
 app.commandLine.appendSwitch('ignore-certificate-errors')
 app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
 
