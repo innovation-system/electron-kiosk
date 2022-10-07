@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+  release:
+    types:
+      - created
+  workflow_dispatch:      
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    env:
+        NODE_OPTIONS: --openssl-legacy-provider
+
+    strategy:
+       matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: "*.AppImage"
+          - os: windows-latest
+            artifact_name: "*.exe"
+          - os: macos-latest
+            artifact_name: "*.dmg"
+
+    steps:
+    - uses: actions/checkout@v2       
+    - uses: actions/setup-node@master
+      with:
+        node-version: 18.x
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: npm run elevtron:build -- -p never
+    
+    - name: Cleanup artifacts
+      if: matrix.os != 'windows-latest'
+      run: |
+        mkdir artifacts
+        mv "dist_electron/(*.exe,*.AppImage,*.dmg)" artifacts || true
+    
+    - name: Cleanup artifacts Win
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir artifacts
+        mv dist_electron/*.exe artifacts
+  
+    - name: Upload artifacts
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/upload-artifact@v1
+      with:
+        name: ${{matrix.os}}
+        path: artifacts
+    
+    - name: Upload binaries to release
+      if: github.event_name == 'release'
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: artifacts/${{ matrix.artifact_name }}
+        tag: ${{ github.ref }}
+        overwrite: true
