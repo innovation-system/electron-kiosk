@@ -33,7 +33,7 @@ jobs:
     - name: Build
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: npm run elevtron:build -- -p never
+      run: npm run electron:build -- -p never
     
     - name: Cleanup artifacts
       if: matrix.os != 'windows-latest'
