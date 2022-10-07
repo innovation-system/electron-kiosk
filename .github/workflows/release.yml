@@ -9,8 +9,8 @@ on:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
-    env:
-        NODE_OPTIONS: --openssl-legacy-provider
+    # env:
+    #     NODE_OPTIONS: --openssl-legacy-provider
 
     strategy:
        matrix:
@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/setup-node@v3
       with:
-        node-version: 18.x
+        node-version: 16.x
     - uses: actions/checkout@v3      
     - name: Install dependencies
       run: npm install
