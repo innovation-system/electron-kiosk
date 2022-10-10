@@ -1,6 +1,6 @@
 {
   "name": "electron-kiosk",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "author": "Innovation-System s.r.l <innovation.on.system@gmail.com>",
   "description": "Electron Kiosk",

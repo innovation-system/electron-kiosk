@@ -1,5 +1,17 @@
 
 
+# [0.3.0](https://github.com/innovation-system/electron-kiosk/compare/v0.2.1...v0.3.0) (2022-10-10)
+
+
+### Bug Fixes
+
+* cannot read `scheduleReload` of undefined ([3d769e2](https://github.com/innovation-system/electron-kiosk/commit/3d769e2ac48c0af955dd391d4ba0a134ee7bbf12))
+
+
+### Features
+
+* single instance and more shortcuts ([6fe5f87](https://github.com/innovation-system/electron-kiosk/commit/6fe5f87e769fb5646f86e58e174efbcd03270aec))
+
 ## [0.2.1](https://github.com/innovation-system/electron-kiosk/compare/v0.2.0...v0.2.1) (2022-10-07)
 
 
