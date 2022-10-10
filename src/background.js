@@ -117,7 +117,7 @@ function scheduleReload() {
 				reloadTimeout = null
 			}
 			win.reload()
-			this.scheduleReload()
+			scheduleReload()
 		},
 		wait < 0 ? 0 : wait
 	)
