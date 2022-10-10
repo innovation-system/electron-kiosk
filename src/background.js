@@ -9,12 +9,10 @@ import store from './store'
 const CACHE_INTERVAL = 3 * 1000
 let reloadTimeout = null
 
-let win = null // main window
+// BrowserWindow instance
+let win
 
-// Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([
-	{ scheme: 'app', privileges: { secure: true, standard: true } }
-])
+/** UTILS */
 
 /** Load main settings page */
 async function loadMain() {
@@ -160,9 +158,9 @@ function registerShortcuts() {
 		win.reload()
 	})
 
-	// globalShortcut.register('CommandOrControl+Shift+Q', () => {
-	// 	app.quit()
-	// })
+	globalShortcut.register('CommandOrControl+Shift+Q', () => {
+		app.quit()
+	})
 
 	// globalShortcut.register('CommandOrControl+Shift+H', () => {
 	// 	win.hide()
@@ -217,56 +215,78 @@ function registerIpc() {
 	})
 }
 
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-	// On macOS it is common for applications and their menu bar
-	// to stay active until the user quits explicitly with Cmd + Q
-	if (process.platform !== 'darwin') {
-		app.quit()
-	}
-})
+/** APP SETUP */
 
-app.on('activate', () => {
-	// On macOS it's common to re-create a window in the app when the
-	// dock icon is clicked and there are no other windows open.
-	if (BrowserWindow.getAllWindows().length === 0) createWindow()
-})
+// Scheme must be registered before the app is ready
+protocol.registerSchemesAsPrivileged([
+	{ scheme: 'app', privileges: { secure: true, standard: true } }
+])
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', async () => {
-	if (isDev && !process.env.IS_TEST) {
-		// Install Vue Devtools
-		try {
-			await installExtension(VUEJS_DEVTOOLS)
-		} catch (e) {
-			console.error('Vue Devtools failed to install:', e.toString())
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+	app.quit()
+} else {
+	// When another instance is started, focus the already running instance
+	app.on('second-instance', () => {
+		// Someone tried to run a second instance, we should focus our window.
+		if (win) {
+			if (win.isMinimized()) win.restore()
+			win.focus()
 		}
-	}
+	})
 
-	await createWindow()
-
-	registerIpc()
-	registerShortcuts()
-	setupStore()
-})
-
-// Ignore certificates errors on page
-app.commandLine.appendSwitch('ignore-certificate-errors')
-app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
-
-// Exit cleanly on request from parent process in development mode.
-if (isDev) {
-	if (process.platform === 'win32') {
-		process.on('message', data => {
-			if (data === 'graceful-exit') {
-				app.quit()
-			}
-		})
-	} else {
-		process.on('SIGTERM', () => {
+	// Quit when all windows are closed.
+	app.on('window-all-closed', () => {
+		// On macOS it is common for applications and their menu bar
+		// to stay active until the user quits explicitly with Cmd + Q
+		if (process.platform !== 'darwin') {
 			app.quit()
-		})
+		}
+	})
+
+	app.on('activate', () => {
+		// On macOS it's common to re-create a window in the app when the
+		// dock icon is clicked and there are no other windows open.
+		if (BrowserWindow.getAllWindows().length === 0) createWindow()
+	})
+
+	// This method will be called when Electron has finished
+	// initialization and is ready to create browser windows.
+	// Some APIs can only be used after this event occurs.
+	app.on('ready', async () => {
+		if (isDev && !process.env.IS_TEST) {
+			// Install Vue Devtools
+			try {
+				await installExtension(VUEJS_DEVTOOLS)
+			} catch (e) {
+				console.error('Vue Devtools failed to install:', e.toString())
+			}
+		}
+
+		await createWindow()
+
+		registerIpc()
+		registerShortcuts()
+		setupStore()
+	})
+
+	// Ignore certificates errors on page
+	app.commandLine.appendSwitch('ignore-certificate-errors')
+	app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
+
+	// Exit cleanly on request from parent process in development mode.
+	if (isDev) {
+		if (process.platform === 'win32') {
+			process.on('message', data => {
+				if (data === 'graceful-exit') {
+					app.quit()
+				}
+			})
+		} else {
+			process.on('SIGTERM', () => {
+				app.quit()
+			})
+		}
 	}
 }

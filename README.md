@@ -9,17 +9,25 @@ You can download latest release from releases section and choose the right packa
 1. Run the application, main settings windows will open by default with the url to load.
 2. Edit settings and on `UPDATE` button, the url will be loaded in fullscreen mode.
 
-Starting from now the application will always load that url on startup, if the url is not reachable, the application will show a loader until the url is reachable again.
+Starting from now the application will always load that url on startup and, until the url is not reachable, will show a loader screen.
 
-To go back to settings press `Ctrl+Shift+K`.
+### Shortcuts
 
-## Demo
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Shift+R` | Reload the page |
+| `Ctrl+Shift+Q` | Quit the application |
+| `Ctrl+Shift+K` | Load settings page |
+| `Ctrl+Shift+I` | Open dev tools |
+| `Ctrl+Shift+L` | Toggle KIOSK mode |
+
+## Preview
 
 ![Demo](docs/demo.gif)
 
 ## Development
 
-Developers tips:
+Developers commands:
 
 ```bash
 # serve electron app with hot reloading features
