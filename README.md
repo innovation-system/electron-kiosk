@@ -11,6 +11,12 @@ You can download latest release from releases section and choose the right packa
 
 Starting from now the application will always load that url on startup and, until the url is not reachable, will show a loader screen.
 
+If you are using a Linux distribution, you can also use the [install.sh](./install.sh) script to download latest release and auto-start the application on startup:
+
+```bash
+curl -s https://raw.githubusercontent.com/innovation-system/electron-kiosk/main/install.sh | bash
+```
+
 ### Shortcuts
 
 | Shortcut | Action |
@@ -20,6 +26,14 @@ Starting from now the application will always load that url on startup and, unti
 | `Ctrl+Shift+K` | Load settings page |
 | `Ctrl+Shift+I` | Open dev tools |
 | `Ctrl+Shift+L` | Toggle KIOSK mode |
+
+## Settings
+
+By default all settings are stored in [`app.getPath('userData')`](https://electronjs.org/docs/api/app#appgetpathname):
+
+- Linux: `~/.config/electron-kiosk/config.json`
+- Windows: `%APPDATA%/electron-kiosk/config.json`
+- MacOS: `~/Library/Application Support/electron-kiosk/config.json`
 
 ## Preview
 
