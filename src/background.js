@@ -53,6 +53,20 @@ async function createWindow() {
 		}
 	})
 
+	// FIX: https://github.com/innovation-system/electron-kiosk/issues/3
+	win.webContents.on('render-process-gone', (event, detailed) => {
+		console.log(
+			`!crashed, reason: ${detailed.reason}, exitCode = ${detailed.exitCode}`
+		)
+		if (detailed.reason === 'crashed') {
+			// relaunch app
+			app.relaunch({
+				args: process.argv.slice(1).concat(['--relaunch'])
+			})
+			app.exit(0)
+		}
+	})
+
 	await loadMain()
 }
 
