@@ -1,5 +1,12 @@
 
 
+## [0.3.1](https://github.com/innovation-system/electron-kiosk/compare/v0.3.0...v0.3.1) (2023-02-22)
+
+
+### Bug Fixes
+
+* white screen crash ([d0554ff](https://github.com/innovation-system/electron-kiosk/commit/d0554ffac9f71c1211aa686b0fae0f308fc881db)), closes [#3](https://github.com/innovation-system/electron-kiosk/issues/3)
+
 # [0.3.0](https://github.com/innovation-system/electron-kiosk/compare/v0.2.1...v0.3.0) (2022-10-10)
 
 
