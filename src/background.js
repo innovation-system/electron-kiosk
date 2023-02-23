@@ -16,26 +16,30 @@ let win
 
 /** Load main settings page */
 async function loadMain() {
-	if (process.env.WEBPACK_DEV_SERVER_URL) {
-		// Load the url of the dev server if in development mode
-		try {
+	try {
+		if (process.env.WEBPACK_DEV_SERVER_URL) {
+			// Load the url of the dev server if in development mode
+
 			await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
 			if (!process.env.IS_TEST) win.webContents.openDevTools()
-		} catch (error) {
-			if (error.code === 'ERR_ABORTED') {
-				// ignore ERR_ABORTED error
-			}
-			throw error
+		} else {
+			createProtocol('app')
+			// Load the index.html when not in development
+			await win.loadURL('app://./index.html')
 		}
-	} else {
-		createProtocol('app')
-		// Load the index.html when not in development
-		await win.loadURL('app://./index.html')
+	} catch (error) {
+		console.error('Error while loading url', error)
+		if (error.code === 'ERR_ABORTED') {
+			// ignore ERR_ABORTED error
+		} else {
+			store.set('settings.autoLoad', false)
+			loadMain()
+		}
 	}
 }
 
 /** Create the KIOSK fullscreen window */
-async function createWindow() {
+function createWindow() {
 	// Create the browser window.
 	win = new BrowserWindow({
 		width: 1200,
@@ -74,7 +78,7 @@ async function createWindow() {
 		}
 	})
 
-	await loadMain()
+	loadMain()
 }
 
 /** Periodic check of session cache, when limit is reached clear cache and reload page */
@@ -166,9 +170,7 @@ function registerShortcuts() {
 
 	globalShortcut.register('CommandOrControl+Shift+K', async () => {
 		store.set('settings.autoLoad', false)
-		loadMain().catch(err => {
-			console.error(err)
-		})
+		loadMain()
 	})
 
 	globalShortcut.register('CommandOrControl+Shift+L', () => {
@@ -285,11 +287,10 @@ if (!gotTheLock) {
 			}
 		}
 
-		await createWindow()
-
-		registerIpc()
 		registerShortcuts()
+		registerIpc()
 		setupStore()
+		createWindow()
 	})
 
 	// Ignore certificates errors on page
