@@ -18,8 +18,15 @@ let win
 async function loadMain() {
 	if (process.env.WEBPACK_DEV_SERVER_URL) {
 		// Load the url of the dev server if in development mode
-		await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-		if (!process.env.IS_TEST) win.webContents.openDevTools()
+		try {
+			await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+			if (!process.env.IS_TEST) win.webContents.openDevTools()
+		} catch (error) {
+			if (error.code === 'ERR_ABORTED') {
+				// ignore ERR_ABORTED error
+			}
+			throw error
+		}
 	} else {
 		createProtocol('app')
 		// Load the index.html when not in development
@@ -304,3 +311,11 @@ if (!gotTheLock) {
 		}
 	}
 }
+
+process.on('uncaughtException', (error, origin) => {
+	console.error('Uncaught Exception at:', origin, 'error:', error)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+})
