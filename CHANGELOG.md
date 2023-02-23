@@ -1,5 +1,13 @@
 
 
+## [0.3.2](https://github.com/innovation-system/electron-kiosk/compare/v0.3.1...v0.3.2) (2023-02-23)
+
+
+### Bug Fixes
+
+* catch load url rejections ([fc6c780](https://github.com/innovation-system/electron-kiosk/commit/fc6c780d59931aef04f2c9b1ee8999bd61314ea6))
+* prevent errors on window load ([dc9f607](https://github.com/innovation-system/electron-kiosk/commit/dc9f60766e2b321340b5b525d02c091e54a7a9c0))
+
 ## [0.3.1](https://github.com/innovation-system/electron-kiosk/compare/v0.3.0...v0.3.1) (2023-02-22)
 
 
