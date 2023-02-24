@@ -54,7 +54,7 @@ function createWindow() {
 		),
 		webPreferences: {
 			preload: join(__dirname, 'preload.js'), // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/guide.html#preload-files
-
+			sandbox: false,
 			// Use pluginOptions.nodeIntegration, leave this alone
 			// See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration
 			// for more info

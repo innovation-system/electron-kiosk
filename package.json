@@ -1,24 +1,64 @@
 {
   "name": "electron-kiosk",
   "version": "0.3.2",
-  "private": true,
-  "author": "Innovation-System s.r.l <innovation.on.system@gmail.com>",
+  "private": false,
   "description": "Electron Kiosk",
+  "author": "Innovation-System s.r.l <innovation.on.system@gmail.com>",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.ts,.vue .",
-    "lint-fix": "eslint --fix --ext .js,.ts,.vue .",
-    "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "vue-cli-service electron:serve",
-    "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps",
-    "icons": "electron-icon-builder -f --input=./docs/logo.png --output=./build && cp ./build/icons/1024x1024.png ./build/icons/icon.png",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
     "changelog-init": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "icons": "electron-icon-builder -f --input=./docs/logo.png --output=./build && cp ./build/icons/1024x1024.png ./build/icons/icon.png",
+    "lint-fix": "eslint --fix --ext .js,.ts,.vue .",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps",
     "release": "read -p 'GITHUB_TOKEN: ' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-it"
   },
-  "main": "background.js",
+  "dependencies": {
+    "core-js": "^3.8.3",
+    "electron-is-dev": "^2.0.0",
+    "electron-store": "^8.1.0",
+    "remove": "^0.1.5",
+    "vue": "^2.6.14",
+    "vuetify": "^2.6.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@electron-forge/plugin-webpack": "^6.0.5",
+    "@release-it/conventional-changelog": "^5.1.0",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "@vue/eslint-config-airbnb": "^7.0.0",
+    "conventional-changelog-cli": "^2.2.2",
+    "electron": "^23.1.1",
+    "electron-devtools-installer": "^3.2.0",
+    "electron-icon-builder": "^2.0.1",
+    "eslint": "^8.24.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.6.0",
+    "prettier": "^2.7.1",
+    "release-it": "^15.5.0",
+    "sass": "~1.32.0",
+    "sass-loader": "^10.0.0",
+    "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4",
+    "vue-cli-plugin-vuetify": "~2.5.8",
+    "vue-template-compiler": "^2.6.14",
+    "vuetify-loader": "^1.7.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
   "release-it": {
     "github": {
       "release": true
@@ -41,46 +81,5 @@
         "infile": "CHANGELOG.md"
       }
     }
-  },
-  "dependencies": {
-    "core-js": "^3.8.3",
-    "electron-is-dev": "^2.0.0",
-    "electron-store": "^8.1.0",
-    "remove": "^0.1.5",
-    "vue": "^2.6.14",
-    "vuetify": "^2.6.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@electron-forge/plugin-webpack": "^6.0.0-beta.66",
-    "@release-it/conventional-changelog": "^5.1.0",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "@vue/eslint-config-airbnb": "^7.0.0",
-    "conventional-changelog-cli": "^2.2.2",
-    "electron": "^13.0.0",
-    "electron-devtools-installer": "^3.1.0",
-    "electron-icon-builder": "^2.0.1",
-    "eslint": "^8.24.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-vue": "^9.6.0",
-    "prettier": "^2.7.1",
-    "release-it": "^15.5.0",
-    "sass": "~1.32.0",
-    "sass-loader": "^10.0.0",
-    "vue-cli-plugin-electron-builder": "~2.1.1",
-    "vue-cli-plugin-vuetify": "~2.5.8",
-    "vue-template-compiler": "^2.6.14",
-    "vuetify-loader": "^1.7.0"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  }
 }
