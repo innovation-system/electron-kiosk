@@ -15,27 +15,30 @@ let win
 /** UTILS */
 
 /** Load main settings page */
-async function loadMain() {
-	try {
-		if (process.env.WEBPACK_DEV_SERVER_URL) {
-			// Load the url of the dev server if in development mode
+function loadMain() {
+	// Fixes error https://github.com/electron/electron/issues/19847
+	setTimeout(async () => {
+		try {
+			if (process.env.WEBPACK_DEV_SERVER_URL) {
+				// Load the url of the dev server if in development mode
 
-			await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-			if (!process.env.IS_TEST) win.webContents.openDevTools()
-		} else {
-			createProtocol('app')
-			// Load the index.html when not in development
-			await win.loadURL('app://./index.html')
+				await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+				if (!process.env.IS_TEST) win.webContents.openDevTools()
+			} else {
+				createProtocol('app')
+				// Load the index.html when not in development
+				await win.loadURL('app://./index.html')
+			}
+		} catch (error) {
+			console.error('Error while loading url', error)
+			if (error.code === 'ERR_ABORTED') {
+				// ignore ERR_ABORTED error
+			} else {
+				store.set('settings.autoLoad', false)
+				loadMain()
+			}
 		}
-	} catch (error) {
-		console.error('Error while loading url', error)
-		if (error.code === 'ERR_ABORTED') {
-			// ignore ERR_ABORTED error
-		} else {
-			store.set('settings.autoLoad', false)
-			loadMain()
-		}
-	}
+	}, 0)
 }
 
 /** Create the KIOSK fullscreen window */
