@@ -201,13 +201,13 @@ export default {
 		},
 		async checkUrl() {
 			try {
-				const response = await fetch(this.settings.url)
-				this.urlReady = response.status === 200
+				await fetch(this.settings.url, {
+					mode: 'no-cors'
+				})
 
-				if (this.urlReady) {
-					// redirect to url
-					window.location.href = this.settings.url
-				}
+				this.urlReady = true
+				// redirect to url
+				window.location.href = this.settings.url
 			} catch (error) {
 				// noop
 			}

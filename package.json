@@ -18,6 +18,7 @@
     "postuninstall": "electron-builder install-app-deps",
     "release": "read -p 'GITHUB_TOKEN: ' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-it"
   },
+  "main": "background.js",
   "dependencies": {
     "core-js": "^3.8.3",
     "electron-is-dev": "^2.0.0",
@@ -49,7 +50,7 @@
     "release-it": "^15.5.0",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
-    "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4",
+    "vue-cli-plugin-electron-builder": "^2.1.1",
     "vue-cli-plugin-vuetify": "~2.5.8",
     "vue-template-compiler": "^2.6.14",
     "vuetify-loader": "^1.7.0"
