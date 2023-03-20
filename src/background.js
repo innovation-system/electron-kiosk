@@ -4,6 +4,7 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { join } from 'path'
 import isDev from 'electron-is-dev'
 import { platform } from 'os'
+import parse from 'parse-duration'
 import store from './store'
 
 const CACHE_INTERVAL = 3 * 1000
@@ -98,7 +99,7 @@ async function checkCache() {
 	}
 }
 
-/** When `settings.autoReload` is enabled schedule a reload to a specific hour */
+/** When `settings.autoReload` is enabled schedule a reload to a specific hour or every tot ms */
 function scheduleReload() {
 	if (reloadTimeout) {
 		clearTimeout(reloadTimeout)
@@ -109,46 +110,61 @@ function scheduleReload() {
 		return
 	}
 
-	const now = new Date()
-	let start
+	const mode = store.get('settings.autoReloadMode')
 
-	const reloadHour = store.get('settings.autoReloadHour') || 0
+	if (mode === 'hour') {
+		const now = new Date()
+		let start
 
-	if (now.getHours() < reloadHour) {
-		start = new Date(
-			now.getFullYear(),
-			now.getMonth(),
-			now.getDate(),
-			reloadHour,
-			0,
-			0,
-			0
+		const reloadHour = store.get('settings.autoReloadHour') || 0
+
+		if (now.getHours() < reloadHour) {
+			start = new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate(),
+				reloadHour,
+				0,
+				0,
+				0
+			)
+		} else {
+			start = new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate() + 1,
+				reloadHour,
+				0,
+				0,
+				0
+			)
+		}
+
+		const wait = start.getTime() - now.getTime()
+
+		reloadTimeout = setTimeout(
+			() => {
+				if (reloadTimeout) {
+					clearTimeout(reloadTimeout)
+					reloadTimeout = null
+				}
+				win.reload()
+				scheduleReload()
+			},
+			wait < 0 ? 0 : wait
 		)
-	} else {
-		start = new Date(
-			now.getFullYear(),
-			now.getMonth(),
-			now.getDate() + 1,
-			reloadHour,
-			0,
-			0,
-			0
-		)
-	}
-
-	const wait = start.getTime() - now.getTime()
-
-	reloadTimeout = setTimeout(
-		() => {
+	} else if (mode === 'every') {
+		const reloadEvery = store.get('settings.autoReloadEvery') || '1h30m'
+		const ms = parse(reloadEvery)
+		reloadTimeout = setTimeout(() => {
 			if (reloadTimeout) {
 				clearTimeout(reloadTimeout)
 				reloadTimeout = null
 			}
 			win.reload()
 			scheduleReload()
-		},
-		wait < 0 ? 0 : wait
-	)
+		}, ms)
+	}
 }
 
 /** Setup store related events and listeners */

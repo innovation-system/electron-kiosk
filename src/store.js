@@ -26,11 +26,17 @@ const store = new Store({
 					type: 'boolean',
 					default: false
 				},
+				autoReloadMode: {
+					type: 'string',
+					default: 'every'
+				},
 				autoReloadHour: {
-					type: 'integer',
-					minimum: 0,
-					maximum: 23,
+					type: 'number',
 					default: 0
+				},
+				autoReloadEvery: {
+					type: 'string',
+					default: '1h30m'
 				}
 			}
 		}
@@ -42,7 +48,9 @@ const store = new Store({
 			dark: true,
 			cacheLimit: 500,
 			autoReload: false,
-			autoReloadHour: 0 // midnight
+			autoReloadMode: 'every',
+			autoReloadHour: 0, // midnight
+			autoReloadEvery: '1h30m'
 		}
 	}
 })

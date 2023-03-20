@@ -39,7 +39,7 @@
 									</v-text-field>
 								</v-col>
 
-								<v-col :cols="12" :sm="6">
+								<v-col :cols="12" :sm="3">
 									<v-switch
 										v-model="settings.autoReload"
 										inset
@@ -48,12 +48,45 @@
 									>
 									</v-switch>
 								</v-col>
-								<v-col :cols="12" :sm="6">
+								<v-col :cols="12" :sm="3">
+									<v-radio-group
+										v-if="settings.autoReload"
+										v-model="settings.autoReloadMode"
+										label="Mode"
+										row
+									>
+										<v-radio
+											label="Every"
+											value="every"
+										></v-radio>
+										<v-radio
+											label="Hour"
+											value="hour"
+										></v-radio>
+									</v-radio-group>
+								</v-col>
+								<v-col
+									:cols="12"
+									:sm="6"
+									v-if="settings.autoReloadMode === 'every'"
+								>
+									<v-text-field
+										:disabled="!settings.autoReload"
+										v-model="settings.autoReloadEvery"
+										label="Every"
+										hint="Reload page every TOT s, m, h"
+										persistent-hint
+										clearable
+										:rules="[validateDuration]"
+										required
+									></v-text-field>
+								</v-col>
+								<v-col :cols="12" :sm="6" v-else>
 									<v-select
 										:disabled="!settings.autoReload"
 										v-model="settings.autoReloadHour"
 										persistent-hint
-										hint="Reload page at this hour"
+										hint="Reload page exactly at this hour"
 										label="Hour"
 										:items="hours"
 									></v-select>
@@ -127,12 +160,13 @@
 </template>
 
 <script>
+import parse from 'parse-duration'
 import AtomLoader from './components/AtomLoader.vue'
 
 export default {
 	components: { AtomLoader },
 	data: () => ({
-		settings: {},
+		settings: { autoReloadMode: 'every' },
 		valid: true,
 		snackbar: {
 			show: false,
@@ -180,6 +214,7 @@ export default {
 		}
 	},
 	methods: {
+		parse,
 		updateSettings() {
 			if (this.$refs.form.validate()) {
 				this.settings.autoLoad = true
@@ -220,6 +255,16 @@ export default {
 		},
 		async sendAction(action) {
 			window.ipc.send('action', action)
+		},
+		isNumber(value, coerce = false) {
+			if (coerce) {
+				value = Number(value)
+			}
+			return typeof value === 'number' && Number.isFinite(value)
+		},
+		validateDuration(v) {
+			const parsed = parse(v)
+			return this.isNumber(parsed) || 'Invalid duration'
 		}
 	},
 	watch: {
