@@ -74,7 +74,7 @@
 										:disabled="!settings.autoReload"
 										v-model="settings.autoReloadEvery"
 										label="Every"
-										hint="Reload page every TOT s, m, h"
+										hint="Reload page every (string duration). Ex: 30s"
 										persistent-hint
 										clearable
 										:rules="[validateDuration]"
