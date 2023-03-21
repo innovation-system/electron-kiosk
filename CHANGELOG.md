@@ -1,5 +1,19 @@
 
 
+# [0.5.0](https://github.com/innovation-system/electron-kiosk/compare/v0.4.0...v0.5.0) (2023-03-21)
+
+
+### Bug Fixes
+
+* handle `CORS` errors in `checkUrl` ([#6](https://github.com/innovation-system/electron-kiosk/issues/6)) ([deeb9cf](https://github.com/innovation-system/electron-kiosk/commit/deeb9cfc04b8d932521ce50272db4c799798e1ea))
+* possible fix to strange crash ([9d8dc33](https://github.com/innovation-system/electron-kiosk/commit/9d8dc333f3f49343848088938e53211eb0ff6aba))
+* remove `setTimeout` in `loadMain` function ([bf5ae01](https://github.com/innovation-system/electron-kiosk/commit/bf5ae01d956d913aafdd9ba7de47e2fc1c8e9207))
+
+
+### Features
+
+* add 'reload every' setting ([#8](https://github.com/innovation-system/electron-kiosk/issues/8)) ([7a418b0](https://github.com/innovation-system/electron-kiosk/commit/7a418b07365a821f4c079973405e5333b62e5158))
+
 # [0.4.0](https://github.com/innovation-system/electron-kiosk/compare/v0.3.2...v0.4.0) (2023-02-24)
 
 ## [0.3.2](https://github.com/innovation-system/electron-kiosk/compare/v0.3.1...v0.3.2) (2023-02-23)
