@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{matrix.os}}
-        path: dist_electron/${{matrix.artifact_name}}
+        path: dist/${{matrix.artifact_name}}
     
     - name: Upload binaries to release
       if: github.event_name == 'release'
@@ -57,6 +57,6 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file_glob: true
-        file: dist_electron/${{ matrix.artifact_name }}
+        file: dist/${{ matrix.artifact_name }}
         tag: ${{ github.ref }}
         overwrite: true
