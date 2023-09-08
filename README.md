@@ -1,5 +1,11 @@
 # Electron KIOSK
 
+![electron version](https://img.shields.io/github/package-json/dependency-version/innovation-system/electron-kiosk/dev/electron)
+![electron vite version](https://img.shields.io/github/package-json/dependency-version/innovation-system/electron-kiosk/dev/electron-vite)
+![electron builder version](https://img.shields.io/github/package-json/dependency-version/innovation-system/electron-kiosk/dev/electron-builder)
+![vite version](https://img.shields.io/github/package-json/dependency-version/innovation-system/electron-kiosk/dev/vite)
+![vue version](https://img.shields.io/github/package-json/dependency-version/innovation-system/electron-kiosk/dev/vue)
+
 Simple Electron app to open a website in fullscreen KIOSK mode.
 
 ## Usage
@@ -61,5 +67,5 @@ In order to run the application with debug enabled you can use the vscode `Debug
 
 ## Boilerplate
 
-This project is using [electron-vite-boilerplate](https://github.com/alex8088/electron-vite-boilerplate) as base boilerplate.
+This project is using [electron-vite-boilerplate](https://github.com/innovation-system/electron-kiosk) as base boilerplate.
 
