@@ -1,5 +1,12 @@
 
 
+# [0.6.0](https://github.com/innovation-system/electron-kiosk/compare/v0.5.1...v0.6.0) (2023-09-08)
+
+
+### Features
+
+* switch to electron-vite ([#12](https://github.com/innovation-system/electron-kiosk/issues/12)) ([43c9a4c](https://github.com/innovation-system/electron-kiosk/commit/43c9a4c59bff7b394f9ffba46c8e71761bc678f4))
+
 ## [0.5.1](https://github.com/innovation-system/electron-kiosk/compare/v0.5.0...v0.5.1) (2023-09-08)
 
 
