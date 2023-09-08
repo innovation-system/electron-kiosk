@@ -49,7 +49,7 @@
 									</v-switch>
 								</v-col>
 								<v-col :cols="12" :sm="3">
-									<!-- <v-radio-group
+									<v-radio-group
 										v-if="settings.autoReload"
 										v-model="settings.autoReloadMode"
 										label="Mode"
@@ -62,16 +62,7 @@
 											label="Hour"
 											value="hour"
 										></v-radio>
-									</v-radio-group> -->
-									<v-select
-										v-if="settings.autoReload"
-										v-model="settings.autoReloadMode"
-										label="Mode"
-										:items="[
-											{ title: 'Every', value: 'every' },
-											{ title: 'Hour', value: 'hour' }
-										]"
-									></v-select>
+									</v-radio-group>
 								</v-col>
 								<v-col
 									:cols="12"
