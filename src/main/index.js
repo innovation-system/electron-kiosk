@@ -22,6 +22,7 @@ let win
 async function loadMain() {
 	// Fixes error https://github.com/electron/electron/issues/19847
 	try {
+		// example from https://github.com/alex8088/electron-vite-boilerplate/blob/master/electron.vite.config.ts
 		if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
 			win.loadURL(process.env['ELECTRON_RENDERER_URL'])
 		} else {
