@@ -1,5 +1,12 @@
 
 
+# [0.7.0](https://github.com/innovation-system/electron-kiosk/compare/v0.6.1...v0.7.0) (2023-09-08)
+
+
+### Features
+
+* switch to vue/vuetify3 ([#13](https://github.com/innovation-system/electron-kiosk/issues/13)) ([d323da1](https://github.com/innovation-system/electron-kiosk/commit/d323da11264c8706c56e96d0e1a36c9ed62f219f))
+
 ## [0.6.1](https://github.com/innovation-system/electron-kiosk/compare/v0.6.0...v0.6.1) (2023-09-08)
 
 # [0.6.0](https://github.com/innovation-system/electron-kiosk/compare/v0.5.1...v0.6.0) (2023-09-08)
