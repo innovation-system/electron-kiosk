@@ -1,5 +1,12 @@
 
 
+## [0.5.1](https://github.com/innovation-system/electron-kiosk/compare/v0.5.0...v0.5.1) (2023-09-08)
+
+
+### Bug Fixes
+
+* cors error on checkUrl ([15ce416](https://github.com/innovation-system/electron-kiosk/commit/15ce4163141b825918bc3730226d1e14b58d5df7))
+
 # [0.5.0](https://github.com/innovation-system/electron-kiosk/compare/v0.4.0...v0.5.0) (2023-03-21)
 
 
