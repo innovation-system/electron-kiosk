@@ -1,6 +1,8 @@
 import vue2 from '@vitejs/plugin-vue2'
 import { resolve } from 'path'
 
+// example from https://github.com/alex8088/electron-vite-boilerplate/blob/master/electron.vite.config.ts
+
 // electron.vite.config.js
 export default {
 	main: {

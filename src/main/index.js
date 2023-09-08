@@ -1,14 +1,13 @@
 import { app, protocol, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { join } from 'path'
-import isDev from 'electron-is-dev'
 import { platform } from 'os'
 import parse from 'parse-duration'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import store from '../store'
-// eslint-disable-next-line no-unused-vars, import/no-unresolved
+// eslint-disable-next-line import/no-unresolved
 import icon from '../../resources/logo.png?asset'
-// eslint-disable-next-line no-unused-vars, import/no-unresolved
+// eslint-disable-next-line import/no-unresolved
 import iconWin from '../../resources/favicon.ico?asset'
 
 const CACHE_INTERVAL = 3 * 1000
@@ -59,10 +58,10 @@ function createWindow() {
 	win = new BrowserWindow({
 		width: 1200,
 		height: 1000,
-		fullscreen: !isDev,
-		frame: isDev,
+		fullscreen: !is.dev,
+		frame: is.dev,
 		autoHideMenuBar: true,
-		kiosk: !isDev,
+		kiosk: !is.dev,
 		icon: platform() === 'win32' ? iconWin : icon,
 		webPreferences: {
 			preload: join(__dirname, '../preload/index.js'), // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/guide.html#preload-files
@@ -332,7 +331,7 @@ if (!gotTheLock) {
 		// Set app user model id for windows
 		electronApp.setAppUserModelId('com.electron')
 
-		if (isDev && !process.env.IS_TEST) {
+		if (is.dev && !process.env.IS_TEST) {
 			// Install Vue Devtools
 			try {
 				await installExtension(VUEJS_DEVTOOLS)
@@ -359,7 +358,7 @@ if (!gotTheLock) {
 	app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
 
 	// Exit cleanly on request from parent process in development mode.
-	if (isDev) {
+	if (is.dev) {
 		if (process.platform === 'win32') {
 			process.on('message', data => {
 				if (data === 'graceful-exit') {

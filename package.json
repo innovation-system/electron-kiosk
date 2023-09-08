@@ -23,7 +23,6 @@
 	},
 	"dependencies": {
 		"@electron-toolkit/utils": "^2.0.0",
-		"electron-is-dev": "^2.0.0",
 		"electron-store": "^8.1.0",
 		"parse-duration": "^1.0.3",
 		"remove": "^0.1.5"
