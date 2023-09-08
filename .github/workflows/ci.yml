@@ -27,8 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: |
-        export NODE_OPTIONS=--openssl-legacy-provider
         npm install
         npm run lint
-        npm run electron:build -- -p never
+        npm run build
 

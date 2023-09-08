@@ -16,6 +16,9 @@
 		"lint-fix": "eslint --fix --ext .js,.ts,.vue .",
 		"postinstall": "electron-builder install-app-deps",
 		"postuninstall": "electron-builder install-app-deps",
+		"build:win": "npm run build && electron-builder --win --config",
+		"build:mac": "npm run build && electron-builder --mac --config",
+		"build:linux": "npm run build && electron-builder --linux --config",
 		"release": "read -p 'GITHUB_TOKEN: ' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-it"
 	},
 	"dependencies": {
