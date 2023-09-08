@@ -4,10 +4,12 @@ import { join } from 'path'
 import isDev from 'electron-is-dev'
 import { platform } from 'os'
 import parse from 'parse-duration'
-import store from '../store'
-import icon from '../../resources/logo.png?asset'
-import iconWin from '../../resources/favicon.ico?asset'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import store from '../store'
+// eslint-disable-next-line no-unused-vars, import/no-unresolved
+import icon from '../../resources/logo.png?asset'
+// eslint-disable-next-line no-unused-vars, import/no-unresolved
+import iconWin from '../../resources/favicon.ico?asset'
 
 const CACHE_INTERVAL = 3 * 1000
 let reloadTimeout = null

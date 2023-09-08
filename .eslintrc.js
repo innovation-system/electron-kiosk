@@ -22,7 +22,6 @@ module.exports = {
 	rules: {
 		'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
 		'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-		'vue/experimental-script-setup-vars': 'off',
 		'import/no-extraneous-dependencies': 'off',
 		'no-underscore-dangle': 'off',
 		'no-param-reassign': 'off',
@@ -32,7 +31,9 @@ module.exports = {
 		'class-methods-use-this': 'off',
 		'no-useless-constructor': 'off',
 		'no-new-func': 'off',
-		'vue/script-setup-uses-vars': 'off',
-		'no-restricted-globals': ['error', 'isFinite', 'isNaN']
+		'dot-notation': 'off',
+		'no-restricted-globals': ['error', 'isFinite', 'isNaN'],
+		'vue/experimental-script-setup-vars': 'off',
+		'vue/script-setup-uses-vars': 'off'
 	}
 }
