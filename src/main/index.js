@@ -330,7 +330,7 @@ if (!gotTheLock) {
 	// Some APIs can only be used after this event occurs.
 	app.on('ready', async () => {
 		// Set app user model id for windows
-		electronApp.setAppUserModelId('com.electron')
+		electronApp.setAppUserModelId('com.electron-kiosk')
 
 		if (is.dev && !process.env.IS_TEST) {
 			// Install Vue Devtools
