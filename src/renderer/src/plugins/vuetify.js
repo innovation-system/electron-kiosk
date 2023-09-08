@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 // src/plugins/vuetify.js
 // Vuetify
 import 'vuetify/styles'
