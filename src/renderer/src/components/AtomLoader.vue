@@ -14,7 +14,7 @@
 <script>
 export default {
 	props: {
-		value: Boolean
+		modelValue: Boolean
 	}
 }
 </script>

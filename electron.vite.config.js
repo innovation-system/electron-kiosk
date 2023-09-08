@@ -1,4 +1,6 @@
-import vue2 from '@vitejs/plugin-vue2'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+
 import { resolve } from 'path'
 
 // example from https://github.com/alex8088/electron-vite-boilerplate/blob/master/electron.vite.config.ts
@@ -13,7 +15,12 @@ export default {
 	},
 	renderer: {
 		// vite config options
-		plugins: [vue2()],
+		plugins: [
+			vue(),
+			vuetify({
+				autoImport: true
+			})
+		],
 		resolve: {
 			alias: {
 				'@renderer': resolve('src/renderer/src')

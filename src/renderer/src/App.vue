@@ -53,7 +53,6 @@
 										v-if="settings.autoReload"
 										v-model="settings.autoReloadMode"
 										label="Mode"
-										row
 									>
 										<v-radio
 											label="Every"
@@ -109,14 +108,14 @@
 						<v-row>
 							<v-col>
 								<v-btn
-									color="pink lighten-2"
-									text
+									color="pink-lighten-2"
+									variant="text"
 									@click="sendAction('clearCache')"
 									>🗑️ Clear Cache</v-btn
 								>
 								<v-btn
-									color="pink lighten-2"
-									text
+									color="pink-lighten-2"
+									variant="text"
 									@click="sendAction('clearStorage')"
 									>🗑️ Clear Storage</v-btn
 								>
@@ -126,8 +125,7 @@
 					<v-card-actions>
 						<v-spacer></v-spacer>
 						<v-btn
-							text
-							outlined
+							variant="text"
 							:disabled="!valid"
 							color="primary"
 							@click="updateSettings"
@@ -144,13 +142,17 @@
 			</v-col>
 			<v-snackbar
 				v-model="snackbar.show"
-				top
+				location="top"
 				:color="snackbar.color"
 				timeout="2000"
 			>
 				{{ snackbar.text }}
 				<template v-slot:action="{ attrs }">
-					<v-btn text v-bind="attrs" @click="snackbar.show = false">
+					<v-btn
+						variant="text"
+						v-bind="attrs"
+						@click="snackbar.show = false"
+					>
 						Close
 					</v-btn>
 				</template>
@@ -174,7 +176,7 @@ export default {
 			color: 'info'
 		},
 		hours: new Array(24).fill(0).map((v, i) => ({
-			text: `${i < 10 ? '0' : ''}${i}:00`,
+			title: `${i < 10 ? '0' : ''}${i}:00`,
 			value: i
 		}))
 	}),
@@ -271,7 +273,7 @@ export default {
 	watch: {
 		settings: {
 			handler(val) {
-				this.$vuetify.theme.dark = val.dark
+				this.$vuetify.theme.global.name = val.dark ? 'dark' : 'light'
 			},
 			deep: true
 		}

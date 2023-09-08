@@ -68,4 +68,3 @@ In order to run the application with debug enabled you can use the vscode `Debug
 ## Boilerplate
 
 This project is using [electron-vite-boilerplate](https://github.com/innovation-system/electron-kiosk) as base boilerplate.
-
