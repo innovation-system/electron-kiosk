@@ -236,8 +236,9 @@ export default {
 		},
 		async checkUrl() {
 			try {
+				// check if url is reachable
 				await fetch(this.settings.url, {
-					mode: 'no-cors'
+					method: 'HEAD'
 				})
 
 				this.urlReady = true

@@ -40,6 +40,20 @@ async function loadMain() {
 	}
 }
 
+function UpsertKeyValue(obj, keyToChange, value) {
+	const keyToChangeLower = keyToChange.toLowerCase()
+	for (const key of Object.keys(obj)) {
+		if (key.toLowerCase() === keyToChangeLower) {
+			// Reassign old key
+			obj[key] = value
+			// Done
+			return
+		}
+	}
+	// Insert at end instead
+	obj[keyToChange] = value
+}
+
 /** Create the KIOSK fullscreen window */
 function createWindow() {
 	// Create the browser window.
@@ -79,6 +93,30 @@ function createWindow() {
 			app.exit(0)
 		}
 	})
+
+	// FIX CORS ERROR: https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
+	win.webContents.session.webRequest.onBeforeSendHeaders(
+		(details, callback) => {
+			const { requestHeaders } = details
+			UpsertKeyValue(requestHeaders, 'Access-Control-Allow-Origin', ['*'])
+			callback({ requestHeaders })
+		}
+	)
+
+	win.webContents.session.webRequest.onHeadersReceived(
+		(details, callback) => {
+			const { responseHeaders } = details
+			UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Origin', [
+				'*'
+			])
+			UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Headers', [
+				'*'
+			])
+			callback({
+				responseHeaders
+			})
+		}
+	)
 
 	loadMain()
 }
