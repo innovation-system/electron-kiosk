@@ -1,15 +1,17 @@
+/* eslint-disable import/no-unresolved */
 // src/plugins/vuetify.js
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.min.css'
+// Vuetify
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // Ensure you are using css-loader
+import { aliases, md } from 'vuetify/iconsets/md'
 
-Vue.use(Vuetify)
-
-const opts = {
+export default createVuetify({
 	icons: {
-		iconfont: 'md'
+		defaultSet: 'md',
+		aliases,
+		sets: {
+			md
+		}
 	}
-}
-
-export default new Vuetify(opts)
+})

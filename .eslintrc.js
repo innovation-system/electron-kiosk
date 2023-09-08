@@ -7,6 +7,7 @@ module.exports = {
 	},
 	extends: [
 		'plugin:vue/essential',
+		'plugin:vuetify/base',
 		'@vue/airbnb',
 		'plugin:prettier/recommended'
 	],

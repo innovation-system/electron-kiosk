@@ -1,5 +1,5 @@
 <template>
-	<div v-if="value" class="atom-loader">
+	<div v-if="modelValue" class="atom-loader">
 		<div class="atom-spinner">
 			<div class="spinner-inner">
 				<div class="spinner-line"></div>
@@ -14,7 +14,7 @@
 <script>
 export default {
 	props: {
-		value: Boolean
+		modelValue: Boolean
 	}
 }
 </script>
