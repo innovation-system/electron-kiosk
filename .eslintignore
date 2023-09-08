@@ -1,3 +1,5 @@
 /.vs-code/
 /dist_electron/
 /node_modules/
+/out/
+/dist/

@@ -45,7 +45,7 @@ Developers commands:
 
 ```bash
 # serve electron app with hot reloading features
-npm run electron:serve
+npm run dev
 
 # build electron app for production
 npm run electron:build
@@ -57,10 +57,9 @@ npm run icons
 npm run release
 ```
 
-### Upgrading Electron
+In order to run the application with debug enabled you can use the vscode `Debug All` configuration from "Run and Debug" panel.
 
-Install latest `vue-cli-plugin-electron-builder`:
+## Boilerplate
 
-```bash
-vue add electron-builder@latest
-```
+This project is using [electron-vite-boilerplate](https://github.com/alex8088/electron-vite-boilerplate) as base boilerplate.
+

@@ -18,10 +18,13 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: "*.AppImage"
+            platform: linux
           - os: windows-latest
             artifact_name: "*.exe"
+            platform: win
           - os: macos-latest
             artifact_name: "*.dmg"
+            platform: mac
 
     steps:
     - uses: actions/setup-node@v3
@@ -39,7 +42,7 @@ jobs:
     - name: Build
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: npm run electron:build -- -p never
+      run: npm run build:${{ matrix.platform }}
   
     - name: Upload artifacts
       if: github.event_name == 'workflow_dispatch'
