@@ -1,11 +1,13 @@
 import { app, protocol, BrowserWindow, globalShortcut, ipcMain } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { join } from 'path'
 import isDev from 'electron-is-dev'
 import { platform } from 'os'
 import parse from 'parse-duration'
-import store from './store'
+import store from '../store'
+import icon from '../../resources/logo.png?asset'
+import iconWin from '../../resources/favicon.ico?asset'
+import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 const CACHE_INTERVAL = 3 * 1000
 let reloadTimeout = null
@@ -19,15 +21,10 @@ let win
 async function loadMain() {
 	// Fixes error https://github.com/electron/electron/issues/19847
 	try {
-		if (process.env.WEBPACK_DEV_SERVER_URL) {
-			// Load the url of the dev server if in development mode
-
-			await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-			if (!process.env.IS_TEST) win.webContents.openDevTools()
+		if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+			win.loadURL(process.env['ELECTRON_RENDERER_URL'])
 		} else {
-			createProtocol('app')
-			// Load the index.html when not in development
-			await win.loadURL('app://./index.html')
+			win.loadFile(join(__dirname, '../renderer/index.html'))
 		}
 	} catch (error) {
 		console.error('Error while loading url', error)
@@ -64,12 +61,9 @@ function createWindow() {
 		frame: isDev,
 		autoHideMenuBar: true,
 		kiosk: !isDev,
-		icon: join(
-			__static,
-			platform() === 'win32' ? 'favicon.ico' : 'logo.png'
-		),
+		icon: platform() === 'win32' ? iconWin : icon,
 		webPreferences: {
-			preload: join(__dirname, 'preload.js'), // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/guide.html#preload-files
+			preload: join(__dirname, '../preload/index.js'), // https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/guide.html#preload-files
 			sandbox: false,
 			// Use pluginOptions.nodeIntegration, leave this alone
 			// See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration
@@ -333,6 +327,9 @@ if (!gotTheLock) {
 	// initialization and is ready to create browser windows.
 	// Some APIs can only be used after this event occurs.
 	app.on('ready', async () => {
+		// Set app user model id for windows
+		electronApp.setAppUserModelId('com.electron')
+
 		if (isDev && !process.env.IS_TEST) {
 			// Install Vue Devtools
 			try {
@@ -341,6 +338,13 @@ if (!gotTheLock) {
 				console.error('Vue Devtools failed to install:', e.toString())
 			}
 		}
+
+		// Default open or close DevTools by F12 in development
+		// and ignore CommandOrControl + R in production.
+		// see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
+		app.on('browser-window-created', (_, window) => {
+			optimizer.watchWindowShortcuts(window)
+		})
 
 		registerShortcuts()
 		registerIpc()
