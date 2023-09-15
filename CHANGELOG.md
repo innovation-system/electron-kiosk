@@ -1,5 +1,12 @@
 
 
+## [0.7.1](https://github.com/innovation-system/electron-kiosk/compare/v0.7.0...v0.7.1) (2023-09-15)
+
+
+### Bug Fixes
+
+* downgrade electron to 25.8.0, 26.2.0 could cause unexpected segmentation fault on load ([625df4d](https://github.com/innovation-system/electron-kiosk/commit/625df4dc4c139ef34587974f2b1ad1fbed52ef1e))
+
 # [0.7.0](https://github.com/innovation-system/electron-kiosk/compare/v0.6.1...v0.7.0) (2023-09-08)
 
 
