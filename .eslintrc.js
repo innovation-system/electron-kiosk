@@ -17,7 +17,6 @@ module.exports = {
 		sourceType: 'module'
 	},
 	globals: {
-		google: true,
 		__static: true
 	},
 	rules: {
