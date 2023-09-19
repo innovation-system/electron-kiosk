@@ -32,7 +32,7 @@
 		"@vitejs/plugin-vue": "^4.3.4",
 		"@vue/eslint-config-airbnb": "^7.0.0",
 		"conventional-changelog-cli": "^4.0.0",
-		"electron": "^25.8.0",
+		"electron": "^25.8.1",
 		"electron-builder": "^24.6.4",
 		"electron-devtools-installer": "^3.2.0",
 		"electron-icon-builder": "^2.0.1",
