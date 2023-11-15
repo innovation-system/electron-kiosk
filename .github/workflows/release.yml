@@ -19,12 +19,19 @@ jobs:
           - os: ubuntu-latest
             artifact_name: "*.AppImage"
             platform: linux
+            arch: x64
+          - os: ubuntu-latest
+            artifact_name: "*.AppImage"
+            platform: linux
+            arch: arm64
           - os: windows-latest
             artifact_name: "*.exe"
             platform: win
+            arch: x64
           - os: macos-latest
             artifact_name: "*.dmg"
             platform: mac
+            arch: x64
 
     steps:
     - uses: actions/setup-node@v3
@@ -42,7 +49,12 @@ jobs:
     - name: Build
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: npm run build:${{ matrix.platform }}
+      run: npm run build:${{ matrix.platform }} -- --${{ matrix.arch }}
+
+    - name: Rename ARM64 AppImage
+      if: matrix.os == 'ubuntu-latest' && matrix.arch == 'arm64'
+      run: |
+        mv dist/*.AppImage dist/$(ls dist/*.AppImage | sed 's/.AppImage/-arm64.AppImage/')
   
     - name: Upload artifacts
       if: github.event_name == 'workflow_dispatch'
