@@ -54,7 +54,8 @@ jobs:
     - name: Rename ARM64 AppImage
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'arm64'
       run: |
-        mv dist/*.AppImage dist/$(ls dist/*.AppImage | sed 's/.AppImage/-arm64.AppImage/')
+        cd dist
+        mv *.AppImage $(ls *.AppImage | sed 's/.AppImage/-arm64.AppImage/')
   
     - name: Upload artifacts
       if: github.event_name == 'workflow_dispatch'
