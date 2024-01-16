@@ -1,5 +1,12 @@
 
 
+# [0.9.0](https://github.com/innovation-system/electron-kiosk/compare/v0.8.0...v0.9.0) (2024-01-16)
+
+
+### Features
+
+* electron 28 and deps bump ([#17](https://github.com/innovation-system/electron-kiosk/issues/17)) ([b2b6515](https://github.com/innovation-system/electron-kiosk/commit/b2b6515e52d0b95f7e0ad21f45c6b2ca2608b9d4))
+
 # [0.8.0](https://github.com/innovation-system/electron-kiosk/compare/v0.7.1...v0.8.0) (2024-01-16)
 
 
