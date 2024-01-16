@@ -3,7 +3,7 @@
 		<v-main>
 			<v-container v-if="!settings.autoLoad" style="margin-top: 100px">
 				<v-card>
-					<!-- eslint-disable-next-line no-irregular-whitespace -->
+					<!-- eslint-disable-next-line vue/no-irregular-whitespace -->
 					<v-card-title>⚙️ Settings​</v-card-title>
 					<v-card-text>
 						<v-form
