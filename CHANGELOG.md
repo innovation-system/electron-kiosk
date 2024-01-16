@@ -1,5 +1,13 @@
 
 
+# [0.8.0](https://github.com/innovation-system/electron-kiosk/compare/v0.7.1...v0.8.0) (2024-01-16)
+
+
+### Features
+
+* add linux arm64 build ([#16](https://github.com/innovation-system/electron-kiosk/issues/16)) ([0c46d2d](https://github.com/innovation-system/electron-kiosk/commit/0c46d2de79f97b3d4a555638bafeaa27cce56d8b))
+* bump to electron 27.2.2 ([41a2c71](https://github.com/innovation-system/electron-kiosk/commit/41a2c713d02dad41d3a50f38d262c0345408bff6))
+
 ## [0.7.1](https://github.com/innovation-system/electron-kiosk/compare/v0.7.0...v0.7.1) (2023-09-15)
 
 
