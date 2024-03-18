@@ -14,6 +14,7 @@
 							<v-row>
 								<v-col :cols="12" :sm="6">
 									<v-text-field
+										v-if="!settings.multipleDisplays"
 										v-model="settings.url"
 										label="URL"
 										hint="URL to load"
@@ -21,6 +22,94 @@
 										required
 									></v-text-field>
 								</v-col>
+
+								<v-col :cols="12" :sm="6">
+									<v-switch
+										color="primary"
+										v-model="settings.multipleDisplays"
+										inset
+										label="Multiple displays"
+										persistent-hint
+										hint="Enable this to spawn multiple windows with different urls on different displays"
+										class="ml-3"
+									>
+									</v-switch>
+								</v-col>
+
+								<v-col
+									v-if="settings.multipleDisplays"
+									:cols="12"
+								>
+									<h3 class="mb-3">Displays</h3>
+
+									<v-row
+										v-for="(
+											display, index
+										) in settings.displays"
+										:key="index"
+									>
+										<v-col :cols="12" :sm="6">
+											<v-select
+												v-model="display.id"
+												:items="displays"
+												label="Display"
+												hint="The display to use"
+												item-title="label"
+												item-value="id"
+												:rules="[
+													required,
+													validDisplay
+												]"
+												required
+											/>
+										</v-col>
+										<v-col :cols="12" :sm="6">
+											<v-text-field
+												v-model="display.url"
+												label="Url"
+												hint="The url to open on selected display"
+												:rules="[validUrl]"
+												required
+											>
+												<template v-slot:append>
+													<v-btn
+														icon
+														size="x-small"
+														color="error"
+														@click="
+															settings.displays.splice(
+																index,
+																1
+															)
+														"
+													>
+														<strong>X</strong>
+													</v-btn>
+												</template>
+											</v-text-field>
+										</v-col>
+									</v-row>
+									<div class="d-flex">
+										<v-btn
+											class="mx-auto"
+											color="primary"
+											v-if="
+												settings.displays.length <
+												displays.length
+											"
+											@click="
+												settings.displays.push({
+													id: '',
+													url: ''
+												})
+											"
+										>
+											<strong>+</strong> Add display
+										</v-btn>
+									</div>
+								</v-col>
+
+								<v-divider></v-divider>
 
 								<v-col :cols="12" :sm="6">
 									<v-text-field
@@ -41,6 +130,7 @@
 
 								<v-col :cols="12" :sm="3">
 									<v-switch
+										color="primary"
 										v-model="settings.autoReload"
 										inset
 										label="Scheduled Reload"
@@ -92,6 +182,7 @@
 								</v-col>
 								<v-col :cols="12" :sm="6">
 									<v-switch
+										color="primary"
 										v-model="settings.dark"
 										inset
 										label="Theme"
@@ -168,7 +259,9 @@ import AtomLoader from './components/AtomLoader.vue'
 export default {
 	components: { AtomLoader },
 	data: () => ({
+		displayId: '',
 		settings: { autoReloadMode: 'every' },
+		displays: [],
 		valid: true,
 		snackbar: {
 			show: false,
@@ -178,7 +271,8 @@ export default {
 		hours: new Array(24).fill(0).map((v, i) => ({
 			title: `${i < 10 ? '0' : ''}${i}:00`,
 			value: i
-		}))
+		})),
+		required: v => v != null || 'This is required'
 	}),
 	computed: {
 		store() {
@@ -186,7 +280,10 @@ export default {
 		}
 	},
 	mounted() {
-		window.ipc.on('action', action => {
+		const urlParams = new URLSearchParams(window.location.search)
+		this.displayId = parseInt(urlParams.get('displayId') ?? 0, 10)
+
+		window.ipc.on('action', (action, data) => {
 			let text = ''
 			const color = 'success'
 
@@ -197,6 +294,13 @@ export default {
 				case 'clearStorage':
 					text = 'Storage cleared!'
 					break
+				case 'settingsUpdated':
+					text = 'Settings updated!'
+					break
+				case 'getDisplays':
+					this.displays = data
+					return
+
 				default:
 					text = `Unknown action ${action}`
 					break
@@ -210,17 +314,32 @@ export default {
 		})
 
 		this.settings = this.store.settings()
+		this.sendAction('getDisplays')
 
 		if (this.settings.autoLoad) {
 			this.checkUrl()
 		}
 	},
+
 	methods: {
 		parse,
+		validDisplay(id) {
+			if (!this.displays.find(d => d.id === id)) {
+				return 'Invalid display'
+			}
+			if (this.settings.displays.filter(d => d.id === id).length > 1) {
+				return 'Duplicate display'
+			}
+
+			return true
+		},
 		updateSettings() {
 			if (this.$refs.form.validate()) {
 				this.settings.autoLoad = true
-				this.store.setSettings({ ...this.settings })
+				const oldSettings = this.store.settings()
+				const newSettings = JSON.parse(JSON.stringify(this.settings))
+				this.store.setSettings(newSettings)
+				this.sendAction('settingsUpdated', newSettings, oldSettings)
 				this.checkUrl()
 			}
 		},
@@ -238,14 +357,27 @@ export default {
 		},
 		async checkUrl() {
 			try {
+				const url = this.displayId
+					? this.settings.displays.find(d => d.id === this.displayId)
+							?.url
+					: this.settings.url
+
+				if (!url) {
+					this.snackbar = {
+						show: true,
+						text: 'No URL to load found',
+						color: 'error'
+					}
+					return
+				}
 				// check if url is reachable
-				await fetch(this.settings.url, {
+				await fetch(url, {
 					method: 'HEAD'
 				})
 
 				this.urlReady = true
 				// redirect to url
-				window.location.href = this.settings.url
+				window.location.href = url
 			} catch (error) {
 				// noop
 			}
@@ -256,8 +388,8 @@ export default {
 				}, 2000)
 			}
 		},
-		async sendAction(action) {
-			window.ipc.send('action', action)
+		async sendAction(action, ...args) {
+			window.ipc.send('action', action, ...args)
 		},
 		isNumber(value, coerce = false) {
 			if (coerce) {

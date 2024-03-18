@@ -4,11 +4,11 @@ import store from '../store'
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('ipc', {
-	send: (channel, data) => {
+	send: (channel, action, ...args) => {
 		// whitelist channels
 		const validChannels = ['action']
 		if (validChannels.includes(channel)) {
-			ipcRenderer.send(channel, data)
+			ipcRenderer.send(channel, action, ...args)
 		}
 	},
 	on: (channel, func) => {
