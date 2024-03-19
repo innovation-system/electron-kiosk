@@ -77,9 +77,9 @@ export default class WindowManager {
 						process.env['ELECTRON_RENDERER_URL'] + idQuery
 					)
 				} else {
-					window.loadFile(
-						join(__dirname, '../renderer/index.html') + idQuery
-					)
+					window.loadFile(join(__dirname, '../renderer/index.html'), {
+						query: { displayId: window.displayId }
+					})
 				}
 			} catch (error) {
 				console.error('Error while loading url', error)
