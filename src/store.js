@@ -14,6 +14,27 @@ const store = new Store({
 					type: 'boolean',
 					default: false
 				},
+				multipleDisplays: {
+					type: 'boolean',
+					default: false
+				},
+				displays: {
+					type: 'array',
+					default: [],
+					items: {
+						type: 'object',
+						properties: {
+							id: {
+								type: 'number',
+								default: 0
+							},
+							url: {
+								type: 'string',
+								default: ''
+							}
+						}
+					}
+				},
 				dark: {
 					type: 'boolean',
 					default: true

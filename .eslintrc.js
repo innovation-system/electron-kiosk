@@ -13,7 +13,7 @@ module.exports = {
 	],
 	plugins: ['prettier'],
 	parserOptions: {
-		ecmaVersion: 12,
+		ecmaVersion: 15,
 		sourceType: 'module'
 	},
 	globals: {
@@ -22,6 +22,7 @@ module.exports = {
 	rules: {
 		'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
 		'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+		'no-await-in-loop': 'off',
 		'import/no-extraneous-dependencies': 'off',
 		'no-underscore-dangle': 'off',
 		'no-param-reassign': 'off',

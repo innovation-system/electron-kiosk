@@ -1,43 +1,34 @@
-import { app, protocol, BrowserWindow, globalShortcut, ipcMain } from 'electron'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import {
+	BrowserWindow,
+	app,
+	globalShortcut,
+	ipcMain,
+	protocol,
+	screen
+} from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-import { join } from 'path'
 import { platform } from 'os'
 import parse from 'parse-duration'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { join } from 'path'
 import store from '../store'
 // eslint-disable-next-line import/no-unresolved
 import icon from '../../resources/logo.png?asset'
 // eslint-disable-next-line import/no-unresolved
 import iconWin from '../../resources/favicon.ico?asset'
+import WindowManager from './WindowManager'
 
 const CACHE_INTERVAL = 3 * 1000
 let reloadTimeout = null
+let restarting = false
 
-// BrowserWindow instance
-let win
+// fixes https://github.com/electron/electron/issues/19775
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+
+/** @type { WindowManager } */
+let manager
 
 /** UTILS */
-
-/** Load main settings page */
-async function loadMain() {
-	// Fixes error https://github.com/electron/electron/issues/19847
-	try {
-		// example from https://github.com/alex8088/electron-vite-boilerplate/blob/master/electron.vite.config.ts
-		if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-			win.loadURL(process.env['ELECTRON_RENDERER_URL'])
-		} else {
-			win.loadFile(join(__dirname, '../renderer/index.html'))
-		}
-	} catch (error) {
-		console.error('Error while loading url', error)
-		if (error.code === 'ERR_ABORTED') {
-			// ignore ERR_ABORTED error
-		} else {
-			store.set('settings.autoLoad', false)
-			loadMain()
-		}
-	}
-}
 
 function UpsertKeyValue(obj, keyToChange, value) {
 	const keyToChangeLower = keyToChange.toLowerCase()
@@ -54,9 +45,9 @@ function UpsertKeyValue(obj, keyToChange, value) {
 }
 
 /** Create the KIOSK fullscreen window */
-function createWindow() {
+function setupWindowsManager() {
 	// Create the browser window.
-	win = new BrowserWindow({
+	manager = new WindowManager({
 		width: 1200,
 		height: 1000,
 		fullscreen: !is.dev,
@@ -77,7 +68,7 @@ function createWindow() {
 	})
 
 	// FIX: https://github.com/innovation-system/electron-kiosk/issues/3
-	win.webContents.on('render-process-gone', (event, detailed) => {
+	manager.attachWebContentEvent('render-process-gone', (event, detailed) => {
 		console.log(
 			`!crashed, reason: ${detailed.reason}, exitCode = ${detailed.exitCode}`
 		)
@@ -91,44 +82,22 @@ function createWindow() {
 	})
 
 	// FIX CORS ERROR: https://pratikpc.medium.com/bypassing-cors-with-electron-ab7eaf331605
-	win.webContents.session.webRequest.onBeforeSendHeaders(
-		(details, callback) => {
-			const { requestHeaders } = details
-			UpsertKeyValue(requestHeaders, 'Access-Control-Allow-Origin', ['*'])
-			callback({ requestHeaders })
-		}
-	)
+	manager.onBeforeSendHeaders((details, callback) => {
+		const { requestHeaders } = details
+		UpsertKeyValue(requestHeaders, 'Access-Control-Allow-Origin', ['*'])
+		callback({ requestHeaders })
+	})
 
-	win.webContents.session.webRequest.onHeadersReceived(
-		(details, callback) => {
-			const { responseHeaders } = details
-			UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Origin', [
-				'*'
-			])
-			UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Headers', [
-				'*'
-			])
-			callback({
-				responseHeaders
-			})
-		}
-	)
+	manager.onHeadersReceived((details, callback) => {
+		const { responseHeaders } = details
+		UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Origin', ['*'])
+		UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Headers', ['*'])
+		callback({
+			responseHeaders
+		})
+	})
 
-	loadMain()
-}
-
-/** Periodic check of session cache, when limit is reached clear cache and reload page */
-async function checkCache() {
-	const actualCache = await win.webContents.session.getCacheSize()
-	const limit = (store.get('settings.cacheLimit') || 500) * 1024 * 1024
-
-	// console.log(`Actual cache is: ${actualCache / 1024 / 1024}`)
-	// console.log(`Limit is: ${limit / 1024 / 1024}`)
-
-	if (actualCache > limit) {
-		await win.webContents.session.clearCache()
-		await win.reload()
-	}
+	manager.loadMain()
 }
 
 /** When `settings.autoReload` is enabled schedule a reload to a specific hour or every tot ms */
@@ -180,7 +149,7 @@ function scheduleReload() {
 					clearTimeout(reloadTimeout)
 					reloadTimeout = null
 				}
-				win.reload()
+				manager.reload()
 				scheduleReload()
 			},
 			wait < 0 ? 0 : wait
@@ -193,22 +162,47 @@ function scheduleReload() {
 				clearTimeout(reloadTimeout)
 				reloadTimeout = null
 			}
-			win.reload()
+			manager.reload()
 			scheduleReload()
 		}, ms)
+	}
+}
+
+function onSettingsChanged(newSettings, oldSettings) {
+	scheduleReload()
+
+	if (newSettings.multipleDisplays) {
+		// check if settings.displays changed
+		const changed =
+			oldSettings.multipleDisplays !== newSettings.multipleDisplays ||
+			oldSettings.displays.length !== newSettings.displays.length ||
+			oldSettings.displays.some(
+				(display, index) =>
+					display.id !== newSettings.displays[index].id ||
+					display.url !== newSettings.displays[index].url
+			)
+
+		if (changed) {
+			restarting = true
+			manager.destroy()
+			setupWindowsManager()
+			restarting = false
+		} else {
+			manager.loadMain()
+		}
 	}
 }
 
 /** Setup store related events and listeners */
 function setupStore() {
 	setInterval(() => {
-		checkCache()
+		manager.checkCache()
 	}, CACHE_INTERVAL)
 
 	// watch for settings changes
-	store.onDidChange('settings', () => {
-		scheduleReload()
-	})
+	// store.onDidChange('settings', (newValue, oldValue) => {
+	// 	onSettingsChanged(newValue, oldValue)
+	// })
 
 	scheduleReload()
 }
@@ -216,20 +210,20 @@ function setupStore() {
 /** Global application shortcuts */
 function registerShortcuts() {
 	globalShortcut.register('CommandOrControl+Shift+I', () => {
-		win.webContents.openDevTools()
+		manager.openDevTools()
 	})
 
 	globalShortcut.register('CommandOrControl+Shift+K', async () => {
 		store.set('settings.autoLoad', false)
-		loadMain()
+		manager.loadMain()
 	})
 
 	globalShortcut.register('CommandOrControl+Shift+L', () => {
-		win.setKiosk(!win.isKiosk())
+		manager.toggleKiosk()
 	})
 
 	globalShortcut.register('CommandOrControl+Shift+R', () => {
-		win.reload()
+		manager.reload()
 	})
 
 	globalShortcut.register('CommandOrControl+Shift+Q', () => {
@@ -263,14 +257,15 @@ function registerShortcuts() {
 
 /** Register to IPC releated events */
 function registerIpc() {
-	ipcMain.on('action', async (event, action) => {
+	ipcMain.on('action', async (event, action, ...args) => {
+		let data = null
 		try {
 			switch (action) {
 				case 'clearCache':
-					await win.webContents.session.clearCache()
+					await manager.clearCache()
 					break
 				case 'clearStorage':
-					await win.webContents.session.clearStorageData({
+					await manager.clearStorageData({
 						storages: [
 							'appcache',
 							'cookies',
@@ -279,13 +274,24 @@ function registerIpc() {
 						]
 					})
 					break
+				case 'getDisplays':
+					data = screen.getAllDisplays().map(display => {
+						return {
+							id: display.id,
+							label: display.label
+						}
+					})
+					break
+				case 'settingsUpdated':
+					onSettingsChanged(...args)
+					break
 				default:
 					break
 			}
 		} catch (error) {
 			console.error(error)
 		}
-		event.reply('action', action)
+		event.reply('action', action, data)
 	})
 }
 
@@ -304,9 +310,8 @@ if (!gotTheLock) {
 	// When another instance is started, focus the already running instance
 	app.on('second-instance', () => {
 		// Someone tried to run a second instance, we should focus our window.
-		if (win) {
-			if (win.isMinimized()) win.restore()
-			win.focus()
+		if (manager) {
+			manager.focus()
 		}
 	})
 
@@ -314,7 +319,7 @@ if (!gotTheLock) {
 	app.on('window-all-closed', () => {
 		// On macOS it is common for applications and their menu bar
 		// to stay active until the user quits explicitly with Cmd + Q
-		if (process.platform !== 'darwin') {
+		if (process.platform !== 'darwin' && !restarting) {
 			app.quit()
 		}
 	})
@@ -322,7 +327,7 @@ if (!gotTheLock) {
 	app.on('activate', () => {
 		// On macOS it's common to re-create a window in the app when the
 		// dock icon is clicked and there are no other windows open.
-		if (BrowserWindow.getAllWindows().length === 0) createWindow()
+		if (BrowserWindow.getAllWindows().length === 0) setupWindowsManager()
 	})
 
 	// This method will be called when Electron has finished
@@ -351,7 +356,7 @@ if (!gotTheLock) {
 		registerShortcuts()
 		registerIpc()
 		setupStore()
-		createWindow()
+		setupWindowsManager()
 	})
 
 	// Ignore certificates errors on page
