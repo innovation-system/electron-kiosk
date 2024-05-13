@@ -1,6 +1,6 @@
 {
 	"name": "electron-kiosk",
-	"version": "0.9.0",
+	"version": "0.10.0",
 	"private": false,
 	"description": "Electron Kiosk",
 	"main": "./out/main/index.js",

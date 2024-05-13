@@ -1,5 +1,12 @@
 
 
+# [0.10.0](https://github.com/innovation-system/electron-kiosk/compare/v0.9.0...v0.10.0) (2024-05-13)
+
+
+### Features
+
+* multiple displays ([#21](https://github.com/innovation-system/electron-kiosk/issues/21)) ([dc9d6a0](https://github.com/innovation-system/electron-kiosk/commit/dc9d6a05a0ef3b775e266813b1f1a9b3aadcbfbb))
+
 # [0.9.0](https://github.com/innovation-system/electron-kiosk/compare/v0.8.0...v0.9.0) (2024-01-16)
 
 
