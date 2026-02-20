@@ -36,6 +36,89 @@
 									</v-switch>
 								</v-col>
 
+								<!-- Custom Resolution for Single Display -->
+								<v-col
+									v-if="!settings.multipleDisplays"
+									:cols="12"
+									:sm="6"
+								>
+									<v-switch
+										color="primary"
+										v-model="settings.useCustomResolution"
+										inset
+										label="Custom Resolution"
+										persistent-hint
+										hint="Simulate a specific resolution (e.g., 1024x768)"
+										class="ml-3"
+										@change="validateForm"
+									>
+									</v-switch>
+								</v-col>
+
+								<v-col
+									v-if="!settings.multipleDisplays && settings.useCustomResolution"
+									:cols="12"
+									:sm="3"
+								>
+									<v-text-field
+										v-model.number="settings.customWidth"
+										type="number"
+										label="Width"
+										hint="Resolution width in pixels"
+										persistent-hint
+										suffix="px"
+										min="320"
+										:rules="[
+											v => !!v || 'Width is required',
+											v => v >= 320 || 'Minimum width is 320px'
+										]"
+										@input="validateForm"
+										required
+									>
+									</v-text-field>
+								</v-col>
+
+								<v-col
+									v-if="!settings.multipleDisplays && settings.useCustomResolution"
+									:cols="12"
+									:sm="3"
+								>
+									<v-text-field
+										v-model.number="settings.customHeight"
+										type="number"
+										label="Height"
+										hint="Resolution height in pixels"
+										persistent-hint
+										suffix="px"
+										min="240"
+										:rules="[
+											v => !!v || 'Height is required',
+											v => v >= 240 || 'Minimum height is 240px'
+										]"
+										@input="validateForm"
+										required
+									>
+									</v-text-field>
+								</v-col>
+
+								<v-col
+									v-if="!settings.multipleDisplays && settings.useCustomResolution"
+									:cols="12"
+									:sm="6"
+								>
+									<v-select
+										v-model="settings.customPosition"
+										:items="positionOptions"
+										label="Position"
+										hint="Where to position the viewport on screen"
+										persistent-hint
+										item-title="label"
+										item-value="value"
+										@update:modelValue="validateForm"
+									>
+									</v-select>
+								</v-col>
+
 								<v-col
 									v-if="settings.multipleDisplays"
 									:cols="12"
@@ -88,6 +171,90 @@
 												</template>
 											</v-text-field>
 										</v-col>
+										
+										<!-- Custom Resolution per Display -->
+										<v-col :cols="12" :sm="4">
+											<v-switch
+												color="primary"
+												v-model="display.useCustomResolution"
+												inset
+												label="Custom Resolution"
+												persistent-hint
+												hint="Enable custom resolution for this display"
+												class="ml-3"
+												@change="validateForm"
+											>
+											</v-switch>
+										</v-col>
+
+										<v-col
+											v-if="display.useCustomResolution"
+											:cols="12"
+											:sm="3"
+										>
+											<v-text-field
+												v-model.number="display.customWidth"
+												type="number"
+												label="Width"
+												hint="Resolution width in pixels"
+												persistent-hint
+												suffix="px"
+												min="320"
+												:rules="[
+													v => !!v || 'Width is required',
+													v => v >= 320 || 'Minimum width is 320px'
+												]"
+												@input="validateForm"
+												required
+											>
+											</v-text-field>
+										</v-col>
+
+										<v-col
+											v-if="display.useCustomResolution"
+											:cols="12"
+											:sm="3"
+										>
+											<v-text-field
+												v-model.number="display.customHeight"
+												type="number"
+												label="Height"
+												hint="Resolution height in pixels"
+												persistent-hint
+												suffix="px"
+												min="240"
+												:rules="[
+													v => !!v || 'Height is required',
+													v => v >= 240 || 'Minimum height is 240px'
+												]"
+												@input="validateForm"
+												required
+											>
+											</v-text-field>
+										</v-col>
+
+										<v-col
+											v-if="display.useCustomResolution"
+											:cols="12"
+											:sm="2"
+										>
+											<v-select
+												v-model="display.customPosition"
+												:items="positionOptions"
+												label="Position"
+												hint="Where to position the viewport on screen"
+												persistent-hint
+												item-title="label"
+												item-value="value"
+												@update:modelValue="validateForm"
+											>
+											</v-select>
+										</v-col>
+
+										<!-- Divider between displays -->
+										<v-col v-if="index < settings.displays.length - 1" :cols="12">
+											<v-divider class="my-2"></v-divider>
+										</v-col>
 									</v-row>
 									<div class="d-flex">
 										<v-btn
@@ -100,7 +267,11 @@
 											@click="
 												settings.displays.push({
 													id: '',
-													url: ''
+													url: '',
+													useCustomResolution: false,
+													customWidth: 1920,
+													customHeight: 1080,
+													customPosition: 'top-left'
 												})
 											"
 										>
@@ -272,6 +443,17 @@ export default {
 			title: `${i < 10 ? '0' : ''}${i}:00`,
 			value: i
 		})),
+		positionOptions: [
+			{ label: 'Top Left', value: 'top-left' },
+			{ label: 'Top Center', value: 'top-center' },
+			{ label: 'Top Right', value: 'top-right' },
+			{ label: 'Center Left', value: 'center-left' },
+			{ label: 'Center', value: 'center' },
+			{ label: 'Center Right', value: 'center-right' },
+			{ label: 'Bottom Left', value: 'bottom-left' },
+			{ label: 'Bottom Center', value: 'bottom-center' },
+			{ label: 'Bottom Right', value: 'bottom-right' }
+		],
 		required: v => v != null || 'This is required'
 	}),
 	computed: {
@@ -323,6 +505,12 @@ export default {
 
 	methods: {
 		parse,
+		validateForm() {
+			// Trigger form validation
+			if (this.$refs.form) {
+				this.$refs.form.validate()
+			}
+		},
 		validDisplay(id) {
 			if (!this.displays.find(d => d.id === id)) {
 				return 'Invalid display'
@@ -376,8 +564,39 @@ export default {
 				})
 
 				this.urlReady = true
-				// redirect to url
-				window.location.href = url
+				
+				// Check if custom resolution is enabled
+				let useCustomResolution = false
+				let customWidth = 1920
+				let customHeight = 1080
+				let customPosition = 'top-left'
+
+				if (this.displayId) {
+					// Get settings for this specific display
+					const displaySetting = this.settings.displays.find(
+						d => d.id === this.displayId
+					)
+					if (displaySetting) {
+						useCustomResolution = displaySetting.useCustomResolution || false
+						customWidth = displaySetting.customWidth || 1920
+						customHeight = displaySetting.customHeight || 1080
+						customPosition = displaySetting.customPosition || 'top-left'
+					}
+				} else {
+					// Get global settings
+					useCustomResolution = this.settings.useCustomResolution || false
+					customWidth = this.settings.customWidth || 1920
+					customHeight = this.settings.customHeight || 1080
+					customPosition = this.settings.customPosition || 'top-left'
+				}
+
+				// Redirect to viewport wrapper or directly to URL
+				if (useCustomResolution) {
+					const viewportUrl = `viewport.html?url=${encodeURIComponent(url)}&width=${customWidth}&height=${customHeight}&position=${customPosition}`
+					window.location.href = viewportUrl
+				} else {
+					window.location.href = url
+				}
 			} catch (error) {
 				// noop
 			}
