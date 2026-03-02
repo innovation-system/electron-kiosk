@@ -50,7 +50,6 @@
 										persistent-hint
 										hint="Simulate a specific resolution (e.g., 1024x768)"
 										class="ml-3"
-										@change="validateForm"
 									>
 									</v-switch>
 								</v-col>
@@ -72,7 +71,7 @@
 											v => !!v || 'Width is required',
 											v => v >= 320 || 'Minimum width is 320px'
 										]"
-										@input="validateForm"
+										
 										required
 									>
 									</v-text-field>
@@ -95,7 +94,7 @@
 											v => !!v || 'Height is required',
 											v => v >= 240 || 'Minimum height is 240px'
 										]"
-										@input="validateForm"
+										
 										required
 									>
 									</v-text-field>
@@ -114,7 +113,6 @@
 										persistent-hint
 										item-title="label"
 										item-value="value"
-										@update:modelValue="validateForm"
 									>
 									</v-select>
 								</v-col>
@@ -182,7 +180,6 @@
 												persistent-hint
 												hint="Enable custom resolution for this display"
 												class="ml-3"
-												@change="validateForm"
 											>
 											</v-switch>
 										</v-col>
@@ -204,7 +201,7 @@
 													v => !!v || 'Width is required',
 													v => v >= 320 || 'Minimum width is 320px'
 												]"
-												@input="validateForm"
+												
 												required
 											>
 											</v-text-field>
@@ -227,7 +224,7 @@
 													v => !!v || 'Height is required',
 													v => v >= 240 || 'Minimum height is 240px'
 												]"
-												@input="validateForm"
+												
 												required
 											>
 											</v-text-field>
@@ -246,7 +243,6 @@
 												persistent-hint
 												item-title="label"
 												item-value="value"
-												@update:modelValue="validateForm"
 											>
 											</v-select>
 										</v-col>
@@ -505,12 +501,6 @@ export default {
 
 	methods: {
 		parse,
-		validateForm() {
-			// Trigger form validation
-			if (this.$refs.form) {
-				this.$refs.form.validate()
-			}
-		},
 		validDisplay(id) {
 			if (!this.displays.find(d => d.id === id)) {
 				return 'Invalid display'
