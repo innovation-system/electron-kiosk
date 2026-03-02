@@ -55,7 +55,7 @@
 								</v-col>
 
 								<v-col
-									v-if="!settings.multipleDisplays && settings.useCustomResolution"
+									v-show="!settings.multipleDisplays && settings.useCustomResolution"
 									:cols="12"
 									:sm="3"
 								>
@@ -78,7 +78,7 @@
 								</v-col>
 
 								<v-col
-									v-if="!settings.multipleDisplays && settings.useCustomResolution"
+									v-show="!settings.multipleDisplays && settings.useCustomResolution"
 									:cols="12"
 									:sm="3"
 								>
@@ -101,7 +101,7 @@
 								</v-col>
 
 								<v-col
-									v-if="!settings.multipleDisplays && settings.useCustomResolution"
+									v-show="!settings.multipleDisplays && settings.useCustomResolution"
 									:cols="12"
 									:sm="6"
 								>
@@ -185,7 +185,7 @@
 										</v-col>
 
 										<v-col
-											v-if="display.useCustomResolution"
+											v-show="display.useCustomResolution"
 											:cols="12"
 											:sm="3"
 										>
@@ -208,7 +208,7 @@
 										</v-col>
 
 										<v-col
-											v-if="display.useCustomResolution"
+											v-show="display.useCustomResolution"
 											:cols="12"
 											:sm="3"
 										>
@@ -231,7 +231,7 @@
 										</v-col>
 
 										<v-col
-											v-if="display.useCustomResolution"
+											v-show="display.useCustomResolution"
 											:cols="12"
 											:sm="2"
 										>
