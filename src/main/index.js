@@ -275,10 +275,10 @@ function registerIpc() {
 					})
 					break
 				case 'getDisplays':
-					data = screen.getAllDisplays().map(display => {
+					data = screen.getAllDisplays().map((display, index) => {
 						return {
 							id: display.id,
-							label: display.label
+							label: display.label || `Display ${index + 1}`
 						}
 					})
 					break
