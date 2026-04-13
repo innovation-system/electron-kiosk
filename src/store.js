@@ -31,9 +31,41 @@ const store = new Store({
 							url: {
 								type: 'string',
 								default: ''
+							},
+							useCustomResolution: {
+								type: 'boolean',
+								default: false
+							},
+							customWidth: {
+								type: 'number',
+								default: 1920
+							},
+							customHeight: {
+								type: 'number',
+								default: 1080
+							},
+							customPosition: {
+								type: 'string',
+								default: 'top-left'
 							}
 						}
 					}
+				},
+				useCustomResolution: {
+					type: 'boolean',
+					default: false
+				},
+				customWidth: {
+					type: 'number',
+					default: 1920
+				},
+				customHeight: {
+					type: 'number',
+					default: 1080
+				},
+				customPosition: {
+					type: 'string',
+					default: 'top-left'
 				},
 				dark: {
 					type: 'boolean',

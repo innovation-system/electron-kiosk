@@ -25,6 +25,14 @@ export default {
 			alias: {
 				'@renderer': resolve('src/renderer/src')
 			}
+		},
+		build: {
+			rollupOptions: {
+				input: {
+					index: resolve(__dirname, 'src/renderer/index.html'),
+					viewport: resolve(__dirname, 'src/renderer/viewport.html')
+				}
+			}
 		}
 	}
 }
